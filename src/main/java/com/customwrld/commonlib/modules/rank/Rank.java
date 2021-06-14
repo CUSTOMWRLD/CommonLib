@@ -1,0 +1,130 @@
+package com.customwrld.commonlib.modules.rank;
+
+import com.customwrld.commonlib.CommonLib;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
+import lombok.Getter;
+import lombok.Setter;
+import org.bson.Document;
+
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Getter @Setter
+public class Rank {
+
+    @Getter private static final Map<UUID, Rank> ranks = new HashMap<>();
+    @Getter private static MongoCollection<Document> collection = CommonLib.getCommonLib().getMongoDatabase().getCollection("ranks");
+
+    public static Comparator<Rank> COMPARATOR = (rank1, rank2) -> rank2.getWeight() - rank1.getWeight();
+
+    private final UUID uuid;
+    private String name;
+    private final List<Rank> inherited = new ArrayList<>();
+    private final List<String> permissions = new ArrayList<>();
+    private String prefix;
+    private int weight;
+    private Color color;
+    private final RankAPI api;
+
+    public Rank(String name, int weight, String prefix, Color color) {
+        this.uuid = UUID.randomUUID();
+        this.name = name;
+        this.weight = weight;
+        this.prefix = prefix;
+        this.color = color;
+        this.api = new RankAPI(this);
+
+        ranks.put(this.uuid, this);
+    }
+
+    private Rank(UUID uuid) {
+        this.uuid = uuid;
+        this.api = new RankAPI(this);
+
+        ranks.put(uuid, this);
+    }
+
+    public static Rank getRank(UUID uuid) {
+        Rank rank = Rank.getRanks().get(uuid);
+
+        if(rank != null) {
+            return rank;
+           }
+
+        Document document = collection.find(Filters.eq("_id", uuid.toString())).first();
+
+        if (document != null) {
+            rank = new Rank(UUID.fromString(document.getString("_id")));
+
+            rank.setName(document.getString("name"));
+            rank.setWeight(document.getInteger("weight"));
+            rank.setPrefix(document.getString("prefix"));
+
+            rank.setColor(new Color(document.getInteger("color")));
+
+            rank.getPermissions().addAll(document.getList("permissions", String.class));
+
+            rank.getInherited().addAll(document.getList("inherits", String.class).
+                    stream()
+                    .map(inherit -> Rank.getRank(UUID.fromString(inherit)))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList()));
+
+            return rank;
+        }
+
+        return null;
+    }
+
+    public static Rank fromDocument(Document document) {
+        if (document != null) {
+            Rank rank = new Rank(UUID.fromString(document.getString("_id")));
+
+            rank.setName(document.getString("name"));
+            rank.setWeight(document.getInteger("weight"));
+            rank.setPrefix(document.getString("prefix"));
+
+            rank.setColor(new Color(document.getInteger("color")));
+
+            rank.getPermissions().addAll(document.getList("permissions", String.class));
+
+            rank.getInherited().addAll(document.getList("inherits", String.class).
+                    stream()
+                    .map(inherit -> Rank.getRank(UUID.fromString(inherit)))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList()));
+
+            return rank;
+        }
+
+        return null;
+    }
+
+    public void delete() {
+        ranks.remove(this.uuid);
+        collection.deleteOne(Filters.eq("_id", this.uuid.toString()));
+    }
+
+    public void save() {
+        Document document = new Document();
+        document.put("_id", this.uuid.toString());
+        document.put("name", this.name);
+        document.put("color", this.color.getRGB());
+        document.put("prefix", this.prefix);
+        document.put("weight", this.weight);
+        document.put("permissions", this.permissions);
+        document.put("inherits", this.inherited.stream().map(Rank::getUuid).map(UUID::toString).collect(Collectors.toList()));
+
+        collection.replaceOne(Filters.eq("_id", this.uuid.toString()), document, new ReplaceOptions().upsert(true));
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        return object instanceof Rank && ((Rank) object).uuid.equals(this.uuid);
+    }
+
+}

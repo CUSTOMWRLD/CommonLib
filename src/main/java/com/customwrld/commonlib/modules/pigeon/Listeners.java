@@ -1,0 +1,128 @@
+package com.customwrld.commonlib.modules.pigeon;
+
+import com.customwrld.commonlib.modules.bukkit.BukkitAPI;
+import com.customwrld.commonlib.modules.bukkit.events.*;
+import com.customwrld.commonlib.modules.grant.Grant;
+import com.customwrld.commonlib.modules.pigeon.payloads.*;
+import com.customwrld.commonlib.modules.profile.Profile;
+import com.customwrld.commonlib.modules.profile.ProfileAPI;
+import com.customwrld.commonlib.modules.punishment.Punishment;
+import com.customwrld.pigeon.annotations.PayloadHandler;
+import com.customwrld.pigeon.annotations.PayloadListener;
+import com.customwrld.pigeon.listeners.Listener;
+import org.bukkit.Bukkit;
+
+@PayloadListener
+public class Listeners implements Listener {
+
+    @PayloadHandler
+    public void onGrantAdd(GrantAddPayload payload) {
+        Grant grant = Grant.getGrant(payload.getGrant());
+
+        if(grant != null) {
+            Profile profile = ProfileAPI.getCachedProfile(grant.getPlayerUUID());
+
+            if(profile != null) {
+                profile.load();
+
+                if(BukkitAPI.isBukkitLoaded()) {
+                    Bukkit.getServer().getPluginManager().callEvent(new GrantAddEvent(grant));
+                }
+            }
+        }
+    }
+
+    @PayloadHandler
+    public void onGrantRemove(GrantRemovePayload payload) {
+        Grant grant = Grant.getGrant(payload.getGrant());
+
+        if(grant != null) {
+            Profile profile = ProfileAPI.getCachedProfile(grant.getPlayerUUID());
+
+            if(profile != null) {
+                profile.load();
+
+                if(BukkitAPI.isBukkitLoaded()) {
+                    Bukkit.getServer().getPluginManager().callEvent(new GrantRemoveEvent(grant));
+                }
+            }
+        }
+    }
+
+    @PayloadHandler
+    public void onGrantExpire(GrantExpirePayload payload) {
+        Grant grant = Grant.getGrant(payload.getGrant());
+
+        if(grant != null) {
+            Profile profile = ProfileAPI.getCachedProfile(grant.getPlayerUUID());
+
+            if(profile != null) {
+                profile.load();
+
+                if(BukkitAPI.isBukkitLoaded()) {
+                    Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant));
+                }
+            }
+        }
+    }
+
+    @PayloadHandler
+    public void onPunishmentAdd(PunishmentAddPayload payload) {
+        Punishment punishment = Punishment.getPunishment(payload.getPunishment());
+
+        if(punishment != null) {
+            Profile profile = ProfileAPI.getCachedProfile(punishment.getPlayerUUID());
+
+            if(profile != null) {
+                profile.load();
+
+                if(BukkitAPI.isBukkitLoaded()) {
+                    Bukkit.getServer().getPluginManager().callEvent(new PunishmentAddEvent(punishment));
+                }
+            }
+        }
+    }
+
+    @PayloadHandler
+    public void onPunishmentRemove(PunishmentRemovePayload payload) {
+        Punishment punishment = Punishment.getPunishment(payload.getPunishment());
+
+        if(punishment != null) {
+            Profile profile = ProfileAPI.getCachedProfile(punishment.getPlayerUUID());
+
+            if(profile != null) {
+                profile.load();
+
+                if(BukkitAPI.isBukkitLoaded()) {
+                    Bukkit.getServer().getPluginManager().callEvent(new PunishmentRemoveEvent(punishment));
+                }
+            }
+        }
+    }
+
+    @PayloadHandler
+    public void onPunishmentExpire(PunishmentExpirePayload payload) {
+        Punishment punishment = Punishment.getPunishment(payload.getPunishment());
+
+        if(punishment != null) {
+            Profile profile = ProfileAPI.getCachedProfile(punishment.getPlayerUUID());
+
+            if(profile != null) {
+                profile.load();
+
+                if(BukkitAPI.isBukkitLoaded()) {
+                    Bukkit.getServer().getPluginManager().callEvent(new PunishmentExpireEvent(punishment));
+                }
+            }
+        }
+    }
+    @PayloadHandler
+    public void onRecalculateProfile(RecalculateProfilePayload payload) {
+        Profile profile = ProfileAPI.getCachedProfile(payload.getProfile());
+
+        if(profile != null) {
+            profile.load();
+        }
+    }
+
+}
