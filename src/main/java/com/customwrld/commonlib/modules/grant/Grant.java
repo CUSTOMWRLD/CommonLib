@@ -5,8 +5,10 @@ import com.customwrld.commonlib.util.Util;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.bson.Document;
 
 import java.util.UUID;
@@ -27,6 +29,7 @@ public class Grant {
     private Long removedAt;
     private String removedReason;
     private boolean removed;
+    @Accessors(fluent = true)
     private final GrantAPI api;
 
     public Grant(UUID playerUUID, UUID rankUUID, UUID addedByUUID, long addedAt, String addedReason, long duration) {

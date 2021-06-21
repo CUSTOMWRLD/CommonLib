@@ -1,12 +1,14 @@
 package com.customwrld.commonlib.modules.rank;
 
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.Document;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RankAPI {
 
@@ -67,7 +69,7 @@ public class RankAPI {
 
         if (includeInheritance) {
             for (Rank inherited : rank.getInherited()) {
-                if (inherited.getApi().hasPermission(permission)) {
+                if (inherited.api().hasPermission(permission)) {
                     return true;
                 }
             }
@@ -108,11 +110,44 @@ public class RankAPI {
 
         if (includeInheritance) {
             for (Rank inherited : this.rank.getInherited()) {
-                permissions.addAll(inherited.getApi().getAllPermissions());
+                permissions.addAll(inherited.api().getAllPermissions());
             }
         }
 
         return permissions;
+    }
+
+    /**
+     * Initialize all the Ranks.
+     */
+    public static void initialize() {
+        Map<Rank, List<UUID>> inheritanceReferences = new HashMap<>();
+
+        Rank.getRanks().clear();
+
+        try (MongoCursor<Document> cursor = Rank.getCollection().find().iterator()) {
+            while (cursor.hasNext()) {
+                Document document = cursor.next();
+
+                Rank rank = Rank.getRank(UUID.fromString(document.getString("_id")));
+
+                List<UUID> ranksToInherit = document.getList("inherits", String.class).
+                        stream()
+                        .map(UUID::fromString).collect(Collectors.toList());
+
+                inheritanceReferences.put(rank, ranksToInherit);
+            }
+        }
+
+        inheritanceReferences.forEach((rank, list) -> list.forEach(uuid -> {
+            Rank inherited = Rank.getRank(uuid);
+
+            if (inherited != null) {
+                rank.getInherited().add(inherited);
+            }
+        }));
+
+        getDefaultRank();
     }
 
 }

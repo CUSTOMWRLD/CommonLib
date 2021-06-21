@@ -36,7 +36,7 @@ public class PunishmentAPI {
     }
 
     /**
-     * Returns the remaining amount of milliseconds of the punishment.
+     * Returns the remaining amount of milliseconds of the Punishment.
      */
     public long getMillisRemaining() {
         return (this.punishment.getAddedAt() + this.punishment.getDuration()) - System.currentTimeMillis();
@@ -108,6 +108,7 @@ public class PunishmentAPI {
     /**
      * Returns a list of TextComponents for the Punishment Message.
      */
+    // TODO: move to custom lib or flame
     public List<TextComponent> getPunishmentMessage() {
         Date date = new Date(this.punishment.getAddedAt());
 

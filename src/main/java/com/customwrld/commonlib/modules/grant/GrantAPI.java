@@ -1,6 +1,7 @@
 package com.customwrld.commonlib.modules.grant;
 
 import com.customwrld.commonlib.modules.rank.Rank;
+import com.customwrld.commonlib.util.TimeUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -33,10 +34,54 @@ public class GrantAPI {
     }
 
     /**
-     * Returns if the Punishment has expired or not.
+     * Returns if the Grant is active or not.
+     */
+    public boolean isActive() {
+        return !this.grant.isRemoved() && (this.isPermanent() || this.getMillisRemaining() < 0L);
+    }
+
+    /**
+     * Returns the remaining amount of milliseconds of the Grant.
+     */
+    public long getMillisRemaining() {
+        return (this.grant.getAddedAt() + this.grant.getDuration()) - System.currentTimeMillis();
+    }
+
+    /**
+     * Returns if the Grant has expired or not.
      */
     public boolean hasExpired() {
         return (!isPermanent()) && (System.currentTimeMillis() >= this.grant.getAddedAt() + this.grant.getDuration());
+    }
+
+    /**
+     * Returns the Duration String.
+     */
+    public String getDurationText() {
+        if (this.isPermanent() || this.grant.getDuration() == 0) {
+            return "Permanent";
+        } else {
+            return TimeUtil.millisToRoundedTime(this.grant.getDuration());
+        }
+    }
+
+    /**
+     * Returns the Remaining String.
+     */
+    public String getTimeRemaining() {
+        if (this.grant.isRemoved()) {
+            return "Removed";
+        }
+
+        if (this.isPermanent()) {
+            return "Permanent";
+        }
+
+        if (hasExpired()) {
+            return "Expired";
+        }
+
+        return TimeUtil.millisToRoundedTime((this.grant.getAddedAt() + this.grant.getDuration()) - System.currentTimeMillis());
     }
 
     /**

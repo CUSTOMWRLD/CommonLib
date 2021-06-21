@@ -10,6 +10,9 @@ import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.commonlib.modules.rank.Rank;
 import com.customwrld.commonlib.modules.rank.RankAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -60,7 +63,7 @@ public class ProfileAPI {
      */
     public Punishment getActivePunishmentByType(Punishment.Type type) {
         for (Punishment punishment : this.profile.getCachedPunishments()) {
-            if (punishment.getType() == type && !punishment.isRemoved() && !punishment.getApi().hasExpired()) {
+            if (punishment.getType() == type && !punishment.isRemoved() && !punishment.api().hasExpired()) {
                 return punishment;
             }
         }
@@ -100,10 +103,10 @@ public class ProfileAPI {
         List<String> permissions = new ArrayList<>();
         for (Grant grant : this.profile.getCachedGrants()) {
 
-            Rank rank = grant.getApi().getRank();
+            Rank rank = grant.api().getRank();
 
             if(rank != null) {
-                permissions.addAll(grant.getApi().getRank().getApi().getAllPermissions());
+                permissions.addAll(grant.api().getRank().api().getAllPermissions());
             }
         }
         return permissions;
@@ -114,7 +117,7 @@ public class ProfileAPI {
      */
     public void validatePunishments() {
         for (Punishment punishment : this.profile.getCachedPunishments()) {
-            if (!punishment.isRemoved() && punishment.getApi().hasExpired()) {
+            if (!punishment.isRemoved() && punishment.api().hasExpired()) {
                 this.expirePunishment(punishment, System.currentTimeMillis());
             }
         }
@@ -133,7 +136,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new PunishmentAddPayload(punishment.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getPluginManager().callEvent(new PunishmentAddEvent(punishment));
+            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentAddEvent(punishment)));
         }
     }
 
@@ -141,14 +144,14 @@ public class ProfileAPI {
      * Removes a Punishment from the Profile.
      */
     public void removePunishment(Punishment punishment, @Nullable UUID removedByUUID, Long removedAt, String removedReason) {
-        punishment.getApi().remove(removedByUUID, removedAt, removedReason);
+        punishment.api().remove(removedByUUID, removedAt, removedReason);
 
         this.profile.save();
 
         this.commonLib.getPigeon().broadcast(new PunishmentRemovePayload(punishment.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getPluginManager().callEvent(new PunishmentRemoveEvent(punishment));
+            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentRemoveEvent(punishment)));
         }
     }
 
@@ -156,14 +159,14 @@ public class ProfileAPI {
      * Expires a Punishment on the Profile.
      */
     public void expirePunishment(Punishment punishment, Long removedAt) {
-        punishment.getApi().remove(null, removedAt, "Punishment Expired");
+        punishment.api().remove(null, removedAt, "Punishment Expired");
 
         this.profile.save();
 
         this.commonLib.getPigeon().broadcast(new PunishmentExpirePayload(punishment.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getPluginManager().callEvent(new PunishmentExpireEvent(punishment));
+            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentExpireEvent(punishment)));
         }
     }
 
@@ -180,7 +183,7 @@ public class ProfileAPI {
                 this.profile.getGrants().remove(grant.getId());
                 grant.delete();
                 iterator.remove();
-            } else if (!grant.isRemoved() && grant.getApi().hasExpired()) {
+            } else if (!grant.isRemoved() && grant.api().hasExpired()) {
                 this.expireGrant(grant, System.currentTimeMillis());
             }
         }
@@ -196,7 +199,7 @@ public class ProfileAPI {
         List<Grant> activeGrants = new ArrayList<>();
 
         for(Grant grant : cachedGrants) {
-            if (!grant.isRemoved() && !grant.getApi().hasExpired()) {
+            if (!grant.isRemoved() && !grant.api().hasExpired()) {
                 activeGrants.add(grant);
             }
         }
@@ -234,7 +237,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new GrantAddPayload(grant.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getPluginManager().callEvent(new GrantAddEvent(grant));
+            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantAddEvent(grant)));
         }
     }
 
@@ -242,13 +245,13 @@ public class ProfileAPI {
      * Removes a Grant from the Profile.
      */
     public void removeGrant(Grant grant, UUID removedBy, Long removedAt, String removedReason) {
-        grant.getApi().remove(removedBy, removedAt, removedReason);
+        grant.api().remove(removedBy, removedAt, removedReason);
         this.profile.save();
 
         this.commonLib.getPigeon().broadcast(new GrantRemovePayload(grant.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getPluginManager().callEvent(new GrantRemoveEvent(grant));
+            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantRemoveEvent(grant)));
         }
     }
 
@@ -256,13 +259,13 @@ public class ProfileAPI {
      * Expires a Grant on the Profile.
      */
     public void expireGrant(Grant grant, Long removedAt) {
-        grant.getApi().remove(null, removedAt, "Grant Expired");
+        grant.api().remove(null, removedAt, "Grant Expired");
         this.profile.save();
 
         this.commonLib.getPigeon().broadcast(new GrantExpirePayload(grant.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant));
+            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant)));
         }
     }
 

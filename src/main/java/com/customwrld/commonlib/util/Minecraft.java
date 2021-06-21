@@ -11,22 +11,36 @@ import org.apache.commons.lang3.StringUtils;
 public class Minecraft {
 
     public static class Style {
-        public static TextComponent CONSOLE = Component.text("CONSOLE").color(NamedTextColor.DARK_RED);
-        public static TextComponent SEPARATOR = Component.text(StringUtils.repeat(" ", 80)).color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.STRIKETHROUGH, true);
+        public static TextComponent CONSOLE = Component.text("Console").color(NamedTextColor.DARK_RED);
+
+        public static TextComponent SEPARATOR = Component.text(StringUtils.repeat(" ", 80))
+                .color(NamedTextColor.DARK_GRAY)
+                .decoration(TextDecoration.STRIKETHROUGH, true)
+                .decoration(TextDecoration.ITALIC, false);
+
+        public static TextComponent MENU_SEPARATOR = Component.text(StringUtils.repeat(" ", 40))
+                .color(NamedTextColor.DARK_GRAY)
+                .decoration(TextDecoration.STRIKETHROUGH, true)
+                .decoration(TextDecoration.ITALIC, false);
 
         public static TextComponent fromLegacy(String string) {
             return LegacyComponentSerializer.legacy('&').deserialize(string);
         }
 
         public static TextComponent getMessageComponent(String prefix, TextComponent component) {
-            return Component.text(prefix)
-                    .color(TextColor.color(NamedTextColor.DARK_AQUA))
+            return Component.text()
+                    .append(
+                            Component.text(prefix)
+                            .color(NamedTextColor.DARK_AQUA)
+                            .decoration(TextDecoration.BOLD, true)
+                    )
                     .append(
                             Component.text(" » ")
                                     .color(NamedTextColor.DARK_GRAY)
                                     .decoration(TextDecoration.BOLD, true)
                     )
-                    .append(component);
+                    .append(component)
+                    .build();
         }
     }
 

@@ -7,13 +7,15 @@ import com.customwrld.commonlib.util.CollectionsUtil;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 public class Profile {
@@ -32,6 +34,7 @@ public class Profile {
     private final Options optionsProfile;
     private final Staff staffProfile;
     private String name;
+    private String searchableName;
     private String currentAddress;
     private String discordId;
     private Integer gold;
@@ -39,9 +42,11 @@ public class Profile {
     private Long lastSeen;
     private Long experience;
     private Map<String, Integer> gameModeGold;
+    @Accessors(fluent = true)
     private final ProfileAPI api;
 
     private Profile(String username, UUID id) {
+        System.out.println("Loading Profile from Mongo -----------");
         this.id = id;
         this.name = username;
         this.permissions = new ArrayList<>();
@@ -55,9 +60,26 @@ public class Profile {
         this.staffProfile = new Staff();
         this.gameModeGold = new HashMap<>();
         this.api = new ProfileAPI(this);
+        this.load();
     }
 
-    public static Profile getProfile(@Nullable String name, UUID id) {
+    public static Profile getProfile(String username) {
+        for(Profile profile : profiles.values()) {
+            if(profile.getName().equalsIgnoreCase(username)) {
+                return profile;
+            }
+        }
+
+        Document document = collection.find(Filters.eq("searchableName", username.toUpperCase())).first();
+
+        if(document != null) {
+            return new Profile(document.getString("name"), UUID.fromString(document.getString("_id")));
+        } else {
+            return null;
+        }
+    }
+
+    public static Profile getProfile(@Nullable String name, @NotNull UUID id) {
         Profile profile = ProfileAPI.getCachedProfile(id);
 
         if(profile != null) {
@@ -65,70 +87,86 @@ public class Profile {
         }
 
         profile = new Profile(name, id);
-        profile.load();
 
         return profile;
     }
 
     public void load() {
-        Document document = collection.find(Filters.eq("_id", this.id.toString())).first();
+        Document document = collection.find(Filters.eq("_id", this.getId().toString())).first();
 
         if (document != null) {
             if (this.name == null) {
-                this.setName(document.getString("name"));
+                this.name = document.getString("name");
             }
 
-            this.setFirstSeen(Long.parseLong(document.getString("firstSeen")));
-            this.setLastSeen(Long.parseLong(document.getString("lastSeen")));
-            this.setCurrentAddress(document.getString("currentAddress"));
+            this.searchableName = this.name.toUpperCase();
+            this.firstSeen = Long.parseLong(document.getString("firstSeen"));
+            this.lastSeen = Long.parseLong(document.getString("lastSeen"));
+            this.currentAddress = document.getString("currentAddress");
 
             Document optionsDocument = (Document) document.get("options");
             Options options = this.getOptionsProfile();
 
-            options.setReceivingFriendRequests(optionsDocument.getBoolean("receivingFriendRequests"));
-            options.setReceivingPublicChat(optionsDocument.getBoolean("receivingPublicChat"));
-            options.setReceivingConversations(optionsDocument.getBoolean("receivingConversations"));
-            options.setReceivingMessageSounds(optionsDocument.getBoolean("receivingMessageSounds"));
+            options.receivingFriendRequests = optionsDocument.getBoolean("receivingFriendRequests");
+            options.receivingPublicChat = optionsDocument.getBoolean("receivingPublicChat");
+            options.receivingConversations = optionsDocument.getBoolean("receivingConversations");
+            options.receivingMessageSounds = optionsDocument.getBoolean("receivingMessageSounds");
 
             Document staffDocument = (Document) document.get("staff");
             Staff staff = this.getStaffProfile();
 
-            staff.setTwoFactorKey(staffDocument.getString("twoFactorKey"));
-            staff.setOperator(staffDocument.getBoolean("operator"));
-            staff.setReceivingStaffMessages(staffDocument.getBoolean("receivingStaffMessages"));
-            staff.setTwoFactor(staffDocument.getBoolean("twoFactor"));
-            staff.setLocked(staffDocument.getBoolean("locked"));
+            staff.twoFactorKey = staffDocument.getString("twoFactorKey");
+            staff.operator = staffDocument.getBoolean("operator");
+            staff.receivingStaffMessages = staffDocument.getBoolean("receivingStaffMessages");
+            staff.twoFactor = staffDocument.getBoolean("twoFactor");
+            staff.locked = staffDocument.getBoolean("locked");
 
-            this.setDiscordId(document.getString("discordId"));
+            this.discordId = document.getString("discordId");
 
-            this.setGold(document.getInteger("gold"));
+            this.gold = document.getInteger("gold");
 
-            this.getGameModeGold().clear();
-            this.setGameModeGold(CollectionsUtil.genericMapToType(document.get("gameModeGold", Map.class), String.class, Integer.class));
+            this.gameModeGold.clear();
+            this.gameModeGold = CollectionsUtil.genericMapToType(document.get("gameModeGold", Map.class), String.class, Integer.class);
 
-            this.setExperience(document.getLong("experience"));
+            this.experience = document.getLong("experience");
 
-            this.getIgnored().clear();
+            this.ignored.clear();
             for (String ignored : document.getList("ignored", String.class)) {
                 UUID ignoredUUID = UUID.fromString(ignored);
-                this.getIgnored().add(ignoredUUID);
+                this.ignored.add(ignoredUUID);
             }
 
-            this.getFriends().clear();
+            this.friends.clear();
             for (String friends : document.getList("friends", String.class)) {
                 UUID friendUUID = UUID.fromString(friends);
-                this.getFriends().add(friendUUID);
+                this.friends.add(friendUUID);
             }
 
-            this.getPermissions().clear();
-            this.getPermissions().addAll(document.getList("permissions", String.class));
+            this.permissions.clear();
+            this.permissions.addAll(document.getList("permissions", String.class));
+
+            this.punishments.clear();
+            this.punishments.addAll(document.getList("punishments", String.class));
+
+            this.cachedPunishments.clear();
+            this.cachedPunishments.addAll(this.punishments.stream().map(Punishment::getPunishment).filter(Objects::nonNull).collect(Collectors.toList()));
+
+            this.grants.clear();
+            this.grants.addAll(document.getList("grants", String.class));
+
+            this.cachedGrants.clear();
+            this.cachedGrants.addAll(this.grants.stream().map(Grant::getGrant).filter(Objects::nonNull).collect(Collectors.toList()));
         }
+
+        this.api.validatePunishments();
+        this.api.getActiveGrant();
     }
 
     public void save() {
         Document document = new Document();
         document.put("_id", this.id.toString());
         document.put("name", this.name);
+        document.put("searchableName", this.name.toUpperCase());
         document.put("firstSeen", this.firstSeen != null ? this.firstSeen.toString() : String.valueOf(System.currentTimeMillis()));
         document.put("lastSeen", this.lastSeen != null ? this.lastSeen.toString() : String.valueOf(System.currentTimeMillis()));
         document.put("currentAddress", this.currentAddress);

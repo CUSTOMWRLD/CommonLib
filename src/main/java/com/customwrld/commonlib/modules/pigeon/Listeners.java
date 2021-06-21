@@ -1,5 +1,6 @@
 package com.customwrld.commonlib.modules.pigeon;
 
+import com.customwrld.commonlib.CommonLib;
 import com.customwrld.commonlib.modules.bukkit.BukkitAPI;
 import com.customwrld.commonlib.modules.bukkit.events.*;
 import com.customwrld.commonlib.modules.grant.Grant;
@@ -26,7 +27,7 @@ public class Listeners implements Listener {
                 profile.load();
 
                 if(BukkitAPI.isBukkitLoaded()) {
-                    Bukkit.getServer().getPluginManager().callEvent(new GrantAddEvent(grant));
+                    Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantAddEvent(grant)));
                 }
             }
         }
@@ -43,7 +44,7 @@ public class Listeners implements Listener {
                 profile.load();
 
                 if(BukkitAPI.isBukkitLoaded()) {
-                    Bukkit.getServer().getPluginManager().callEvent(new GrantRemoveEvent(grant));
+                    Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantRemoveEvent(grant)));
                 }
             }
         }
@@ -60,7 +61,7 @@ public class Listeners implements Listener {
                 profile.load();
 
                 if(BukkitAPI.isBukkitLoaded()) {
-                    Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant));
+                    Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant)));
                 }
             }
         }
@@ -77,7 +78,7 @@ public class Listeners implements Listener {
                 profile.load();
 
                 if(BukkitAPI.isBukkitLoaded()) {
-                    Bukkit.getServer().getPluginManager().callEvent(new PunishmentAddEvent(punishment));
+                    Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentAddEvent(punishment)));
                 }
             }
         }
@@ -94,7 +95,7 @@ public class Listeners implements Listener {
                 profile.load();
 
                 if(BukkitAPI.isBukkitLoaded()) {
-                    Bukkit.getServer().getPluginManager().callEvent(new PunishmentRemoveEvent(punishment));
+                    Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentRemoveEvent(punishment)));
                 }
             }
         }
@@ -111,7 +112,7 @@ public class Listeners implements Listener {
                 profile.load();
 
                 if(BukkitAPI.isBukkitLoaded()) {
-                    Bukkit.getServer().getPluginManager().callEvent(new PunishmentExpireEvent(punishment));
+                    Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentExpireEvent(punishment)));
                 }
             }
         }

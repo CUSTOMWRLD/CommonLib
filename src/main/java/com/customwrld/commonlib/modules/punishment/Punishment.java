@@ -1,6 +1,7 @@
 package com.customwrld.commonlib.modules.punishment;
 
 import com.customwrld.commonlib.CommonLib;
+import com.customwrld.commonlib.modules.profile.Profile;
 import com.customwrld.commonlib.modules.rank.RankAPI;
 import com.customwrld.commonlib.util.Minecraft;
 import com.customwrld.commonlib.util.Util;
@@ -11,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.Document;
 
@@ -33,6 +35,7 @@ public class Punishment {
     private Long removedAt;
     private String removedReason;
     private boolean removed;
+    @Accessors(fluent = true)
     private final PunishmentAPI api;
 
     public Punishment(UUID playerUUID, Type type, UUID addedByUUID, long addedAt, String addedReason, long duration) {

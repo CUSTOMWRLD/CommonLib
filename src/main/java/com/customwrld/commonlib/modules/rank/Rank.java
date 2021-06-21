@@ -4,8 +4,10 @@ import com.customwrld.commonlib.CommonLib;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.bson.Document;
 
 import java.awt.*;
@@ -28,6 +30,7 @@ public class Rank {
     private String prefix;
     private int weight;
     private Color color;
+    @Accessors(fluent = true)
     private final RankAPI api;
 
     public Rank(String name, int weight, String prefix, Color color) {
@@ -53,7 +56,7 @@ public class Rank {
 
         if(rank != null) {
             return rank;
-           }
+        }
 
         Document document = collection.find(Filters.eq("_id", uuid.toString())).first();
 
@@ -68,13 +71,23 @@ public class Rank {
 
             rank.getPermissions().addAll(document.getList("permissions", String.class));
 
-            rank.getInherited().addAll(document.getList("inherits", String.class).
-                    stream()
+            rank.getInherited().addAll(document.getList("inherits", String.class)
+                    .stream()
                     .map(inherit -> Rank.getRank(UUID.fromString(inherit)))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()));
 
             return rank;
+        }
+
+        return null;
+    }
+
+    public static Rank getRank(String name) {
+        for (Rank rank : ranks.values()) {
+            if (rank.getName().equalsIgnoreCase(name)) {
+                return rank;
+            }
         }
 
         return null;
