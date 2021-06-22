@@ -1,6 +1,5 @@
 package com.customwrld.commonlib.modules.punishment;
 
-import com.customwrld.commonlib.util.Minecraft;
 import com.customwrld.commonlib.util.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -103,48 +102,6 @@ public class PunishmentAPI {
         this.punishment.setRemovedAt(removedAt);
         this.punishment.setRemovedReason(removedReason);
         this.punishment.save();
-    }
-
-    /**
-     * Returns a list of TextComponents for the Punishment Message.
-     */
-    // TODO: move to custom lib or flame
-    public List<TextComponent> getPunishmentMessage() {
-        Date date = new Date(this.punishment.getAddedAt());
-
-        return Arrays.asList(
-                Minecraft.Style.SEPARATOR,
-                Component.text("You are " + this.getContext() + (!this.isPermanent() ? " for " + this.getTimeRemaining() : "") + ".")
-                        .color(NamedTextColor.RED),
-                Component.empty(),
-                Component.text("Reason: ")
-                        .color(NamedTextColor.GRAY)
-                        .append(
-                                Component.text(this.punishment.getAddedReason())
-                                        .color(NamedTextColor.WHITE)
-                        ),
-                Component.text("Added On: ")
-                        .color(NamedTextColor.GRAY)
-                        .append(
-                                Component.text(TimeUtil.dateToString(date) + " at " + TimeUtil.dateToTime(date))
-                                        .color(NamedTextColor.WHITE)
-                        ),
-                Component.text("Punishment ID: ")
-                        .color(NamedTextColor.GRAY)
-                        .append(
-                                Component.text(this.punishment.getId())
-                                        .color(NamedTextColor.WHITE)
-                        ),
-                Component.empty(),
-                Component.text("Appeal At: ")
-                        .color(NamedTextColor.GRAY)
-                        .append(
-                                Component.text("https://customwrld.com/discord")
-                                        .color(NamedTextColor.AQUA)
-                                        .decoration(TextDecoration.UNDERLINED, true)
-                        ),
-                Minecraft.Style.SEPARATOR
-        );
     }
 
 }
