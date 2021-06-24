@@ -15,14 +15,14 @@ import org.bukkit.plugin.Plugin;
 public class CommonLib {
 
     @Getter private static CommonLib commonLib;
-    @Setter private Plugin plugin;
+//    @Setter private Plugin plugin;
     @Setter private boolean bukkitLoaded;
 
     private final MongoClient mongoClient;
     private final MongoDatabase mongoDatabase;
     private final Pigeon pigeon;
 
-    public CommonLib(MongoClient mongoClient, MongoDatabase mongoDatabase, Pigeon pigeon, Plugin plugin) {
+    public CommonLib(MongoClient mongoClient, MongoDatabase mongoDatabase, Pigeon pigeon) {
         commonLib = this;
 
         this.mongoClient = mongoClient;
@@ -37,8 +37,6 @@ public class CommonLib {
 
         this.pigeon.getListenersRegistry()
                 .registerListener(new Listeners());
-
-        this.plugin = plugin;
 
         RankAPI.initialize();
     }

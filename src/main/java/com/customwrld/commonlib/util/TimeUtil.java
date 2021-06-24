@@ -22,20 +22,17 @@ public final class TimeUtil {
         return new DecimalFormat("#0.0").format(millis / 1000.0F);
     }
 
-    public static String dateToString(Date date) {
+    public static String dateToString(Date date, boolean time) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
+        String pattern = "EEE, dd MMM yyyy";
 
-        return dateFormat.format(date);
-    }
+        if(time) {
+            pattern += " hh:mm:ss a";
+        }
 
-    public static String dateToTime(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss a");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
 
         return dateFormat.format(date);
     }

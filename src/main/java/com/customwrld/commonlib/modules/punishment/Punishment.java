@@ -111,30 +111,16 @@ public class Punishment {
     @AllArgsConstructor
     public enum Type {
 
-        BLACKLIST("Blacklist", "blacklisted", "unblacklisted", true, true,
-                new Data("Blacklists", new Color(NamedTextColor.DARK_RED.value()))),
-        BAN("Ban", "banned", "unbanned", true, true,
-                new Data("Bans", new Color(NamedTextColor.GOLD.value()))),
-        MUTE("Mute", "muted", "unmuted", false, true,
-                new Data("Mutes", new Color(NamedTextColor.GREEN.value()))),
-        WARN("Warning", "warned", null, false, false,
-                new Data("Warnings", new Color(NamedTextColor.BLUE.value())));
+        BLACKLIST("Blacklist", "blacklisted", "unblacklisted", true, true),
+        BAN("Ban", "banned", "unbanned", true, true),
+        MUTE("Mute", "muted", "unmuted", false, true),
+        WARN("Warning", "warned", null, false, false);
 
         private final String readable;
         private final String context;
         private final String undoContext;
         private final boolean ban;
         private final boolean removable;
-        private final Data typeData;
-
-        @Getter
-        @AllArgsConstructor
-        public static class Data {
-
-            private final String readable;
-            private final Color color;
-
-        }
 
     }
 

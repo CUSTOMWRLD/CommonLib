@@ -134,7 +134,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new PunishmentAddPayload(punishment.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentAddEvent(punishment)));
+//            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentAddEvent(punishment)));
         }
     }
 
@@ -149,7 +149,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new PunishmentRemovePayload(punishment.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentRemoveEvent(punishment)));
+//            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentRemoveEvent(punishment)));
         }
     }
 
@@ -164,7 +164,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new PunishmentExpirePayload(punishment.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentExpireEvent(punishment)));
+//            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new PunishmentExpireEvent(punishment)));
         }
     }
 
@@ -235,7 +235,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new GrantAddPayload(grant.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantAddEvent(grant)));
+//            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantAddEvent(grant)));
         }
     }
 
@@ -249,7 +249,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new GrantRemovePayload(grant.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantRemoveEvent(grant)));
+//            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantRemoveEvent(grant)));
         }
     }
 
@@ -263,7 +263,7 @@ public class ProfileAPI {
         this.commonLib.getPigeon().broadcast(new GrantExpirePayload(grant.getId()));
 
         if(BukkitAPI.isBukkitLoaded()) {
-            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant)));
+//            Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant)));
         }
     }
 
