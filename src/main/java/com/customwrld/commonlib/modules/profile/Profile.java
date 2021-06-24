@@ -2,6 +2,7 @@ package com.customwrld.commonlib.modules.profile;
 
 import com.customwrld.commonlib.CommonLib;
 import com.customwrld.commonlib.modules.grant.Grant;
+import com.customwrld.commonlib.modules.network.Gamemode;
 import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.commonlib.util.CollectionsUtil;
 import com.mongodb.client.MongoCollection;
@@ -41,7 +42,7 @@ public class Profile {
     private Long firstSeen;
     private Long lastSeen;
     private Long experience;
-    private Map<String, Integer> gameModeGold;
+    private Map<Gamemode, GamemodeStorage> gamemodeStorages;
     @Accessors(fluent = true)
     private final ProfileAPI api;
 
@@ -58,7 +59,7 @@ public class Profile {
         this.friends = new ArrayList<>();
         this.optionsProfile = new Options();
         this.staffProfile = new Staff();
-        this.gameModeGold = new HashMap<>();
+        this.gamemodeStorages = new HashMap<>();
         this.api = new ProfileAPI(this);
         this.load();
     }
@@ -125,8 +126,10 @@ public class Profile {
 
             this.gold = document.getInteger("gold");
 
-            this.gameModeGold.clear();
-            this.gameModeGold = CollectionsUtil.genericMapToType(document.get("gameModeGold", Map.class), String.class, Integer.class);
+            this.gamemodeStorages.clear();
+            for(Map.Entry<String, Object> ent : document.get("gamemodeStorage", Document.class).entrySet()) {
+                Gamemode.getByName(ent.getKey(), gamemode -> this.gamemodeStorages.put(gamemode, new GamemodeStorage(ent.getKey(), (Document) ent.getValue())));
+            }
 
             this.experience = document.getLong("experience");
 
@@ -189,7 +192,19 @@ public class Profile {
         document.put("discord", this.discordId);
 
         document.put("gold", this.gold);
-        document.put("gameModeGold", this.gameModeGold);
+
+        var storagesDocument = new Document();
+        for(Map.Entry<Gamemode, GamemodeStorage> ent : this.gamemodeStorages.entrySet()) {
+            var storageDocument = new Document();
+            for(Map.Entry<String, GamemodeStorage.StorageValue> valueEnt : ent.getValue().getValues().entrySet()) {
+                storageDocument.append(valueEnt.getKey(),
+                        new Document("value", valueEnt.getValue().getValue())
+                                .append("isWritable", valueEnt.getValue().isWritable()));
+            }
+            storagesDocument.put(ent.getKey().getName(), storageDocument);
+        }
+        document.put("gamemodeStorage", storagesDocument);
+
         document.put("experience", this.experience);
 
         document.put("grants", this.grants);

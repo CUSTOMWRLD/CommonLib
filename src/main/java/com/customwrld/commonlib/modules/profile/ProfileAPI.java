@@ -5,6 +5,7 @@ import com.customwrld.commonlib.modules.bukkit.BukkitAPI;
 import com.customwrld.commonlib.modules.bukkit.events.*;
 import com.customwrld.commonlib.modules.grant.Grant;
 import com.customwrld.commonlib.modules.grant.GrantAPI;
+import com.customwrld.commonlib.modules.network.Gamemode;
 import com.customwrld.commonlib.modules.pigeon.payloads.*;
 import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.commonlib.modules.rank.Rank;
@@ -15,10 +16,7 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ProfileAPI {
 
@@ -267,6 +265,46 @@ public class ProfileAPI {
         if(BukkitAPI.isBukkitLoaded()) {
             Bukkit.getServer().getScheduler().runTask(CommonLib.getCommonLib().getPlugin(), () -> Bukkit.getServer().getPluginManager().callEvent(new GrantExpireEvent(grant)));
         }
+    }
+
+    public boolean addGamemodeStorage(GamemodeStorage storage) {
+        var gamemodeStorages = this.profile.getGamemodeStorages();
+
+        var gamemode = storage.getGamemode();
+        if(gamemodeStorages.containsKey(gamemode)) { return false; }
+
+        gamemodeStorages.put(gamemode, storage);
+        return true;
+    }
+
+    public GamemodeStorage getGamemodeStorage(Gamemode gamemode) {
+        return this.profile.getGamemodeStorages().get(gamemode);
+    }
+
+    public boolean hasGamemodeStorage(Gamemode gamemode) {
+        return this.profile.getGamemodeStorages().containsKey(gamemode);
+    }
+
+    public boolean ensureGamemodeStorage(Gamemode gamemode, List<GamemodeStorage.StorageValue> values) {
+        var anyEnsured = false;
+
+        if(hasGamemodeStorage(gamemode)) {
+            var storage = getGamemodeStorage(gamemode);
+            for(GamemodeStorage.StorageValue value : values) {
+                if(storage.ensure(value)) { anyEnsured = true; }
+            }
+        } else {
+            anyEnsured = true;
+
+            var storage = new GamemodeStorage(gamemode);
+            for(GamemodeStorage.StorageValue value : values) {
+                storage.add(value);
+            }
+
+            addGamemodeStorage(storage);
+        }
+
+        return anyEnsured;
     }
 
 }
