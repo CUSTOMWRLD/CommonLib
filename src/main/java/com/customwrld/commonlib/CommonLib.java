@@ -30,6 +30,9 @@ public class CommonLib {
         this.pigeon = pigeon;
 
         this.pigeon.getPayloadsRegistry()
+                .registerPayloadsInPackage("com.customwrld.commonlib.modules.pigeon.converters");
+
+        this.pigeon.getPayloadsRegistry()
                 .registerPayloadsInPackage("com.customwrld.commonlib.modules.pigeon.payloads");
 
         this.pigeon.getListenersRegistry()
