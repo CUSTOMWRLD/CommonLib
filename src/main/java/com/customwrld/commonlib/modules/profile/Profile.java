@@ -46,7 +46,6 @@ public class Profile {
     private final ProfileAPI api;
 
     private Profile(String username, UUID id) {
-        System.out.println("Loading Profile from Mongo -----------");
         this.id = id;
         this.name = username;
         this.permissions = new ArrayList<>();
