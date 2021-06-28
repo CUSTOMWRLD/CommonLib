@@ -63,7 +63,7 @@ public class Profile {
         this.load();
     }
 
-    public static Profile getProfile(String username) {
+    public static Profile getProfile(@NotNull String username) {
         for(Profile profile : profiles.values()) {
             if(profile.getName().equalsIgnoreCase(username)) {
                 return profile;
@@ -89,6 +89,10 @@ public class Profile {
         profile = new Profile(name, id);
 
         return profile;
+    }
+
+    public static Profile getProfile(@NotNull UUID id) {
+        return getProfile(null, id);
     }
 
     public void load() {

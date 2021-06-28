@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 public final class TimeUtil {
 
@@ -23,16 +24,14 @@ public final class TimeUtil {
     }
 
     public static String dateToString(Date date, boolean time) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        String pattern = "EEE, dd MMM yyyy";
+        String pattern = "EEE, MMM dd yyyy";
 
         if(time) {
-            pattern += " hh:mm:ss a";
+            pattern += " hh:mm a";
         }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("est"));
 
         return dateFormat.format(date);
     }

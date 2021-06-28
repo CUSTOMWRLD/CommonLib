@@ -43,7 +43,7 @@ public abstract class AbstractTransactionContext {
     }
 
     public boolean process(boolean needsEnoughBalance, boolean logTransaction) {
-        Profile profile = Profile.getProfile(null, this.player.getUniqueId());
+        Profile profile = Profile.getProfile(this.player.getUniqueId());
         Map<Currencies.CurrencyType, Integer> totals = getTotals();
         if (needsEnoughBalance) {
             for (Map.Entry<Currencies.CurrencyType, Integer> ent : totals.entrySet()) {

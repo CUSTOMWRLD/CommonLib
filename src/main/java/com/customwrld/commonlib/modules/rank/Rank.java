@@ -21,7 +21,7 @@ public class Rank {
     @Getter private static final Map<UUID, Rank> ranks = new HashMap<>();
     @Getter private static MongoCollection<Document> collection = CommonLib.getCommonLib().getMongoDatabase().getCollection("ranks");
 
-    public static Comparator<Rank> COMPARATOR = (rank1, rank2) -> rank2.getWeight() - rank1.getWeight();
+    public static Comparator<Rank> COMPARATOR = Comparator.comparingInt(Rank::getWeight);
 
     private final UUID uuid;
     private String name;
@@ -29,11 +29,11 @@ public class Rank {
     private final List<String> permissions = new ArrayList<>();
     private String prefix;
     private int weight;
-    private Color color;
+    private String color;
     @Accessors(fluent = true)
     private final RankAPI api;
 
-    public Rank(String name, int weight, String prefix, Color color) {
+    public Rank(String name, int weight, String prefix, String color) {
         this.uuid = UUID.randomUUID();
         this.name = name;
         this.weight = weight;
@@ -51,8 +51,12 @@ public class Rank {
         ranks.put(uuid, this);
     }
 
-    public static Rank getRank(UUID uuid) {
-        Rank rank = Rank.getRanks().get(uuid);
+    public static Rank getRank(UUID uuid, boolean checkCache) {
+        Rank rank =  null;
+
+        if(checkCache) {
+            rank = Rank.getRanks().get(uuid);
+        }
 
         if(rank != null) {
             return rank;
@@ -67,13 +71,13 @@ public class Rank {
             rank.setWeight(document.getInteger("weight"));
             rank.setPrefix(document.getString("prefix"));
 
-            rank.setColor(new Color(document.getInteger("color")));
+            rank.setColor(document.getString("color"));
 
             rank.getPermissions().addAll(document.getList("permissions", String.class));
 
             rank.getInherited().addAll(document.getList("inherits", String.class)
                     .stream()
-                    .map(inherit -> Rank.getRank(UUID.fromString(inherit)))
+                    .map(inherit -> Rank.getRank(UUID.fromString(inherit), true))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()));
 
@@ -101,13 +105,13 @@ public class Rank {
             rank.setWeight(document.getInteger("weight"));
             rank.setPrefix(document.getString("prefix"));
 
-            rank.setColor(new Color(document.getInteger("color")));
+            rank.setColor(document.getString("color"));
 
             rank.getPermissions().addAll(document.getList("permissions", String.class));
 
             rank.getInherited().addAll(document.getList("inherits", String.class).
                     stream()
-                    .map(inherit -> Rank.getRank(UUID.fromString(inherit)))
+                    .map(inherit -> Rank.getRank(UUID.fromString(inherit), true))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()));
 
@@ -126,7 +130,7 @@ public class Rank {
         Document document = new Document();
         document.put("_id", this.uuid.toString());
         document.put("name", this.name);
-        document.put("color", this.color.getRGB());
+        document.put("color", this.color);
         document.put("prefix", this.prefix);
         document.put("weight", this.weight);
         document.put("permissions", this.permissions);

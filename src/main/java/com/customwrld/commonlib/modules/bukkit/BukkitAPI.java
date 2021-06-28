@@ -27,6 +27,7 @@ public class BukkitAPI {
     /**
      * Sets up the Bukkit Player.
      */
+    // TODO: Move to Flame
     public static void setupBukkitPlayer(Plugin plugin, Profile profile) {
         if(isBukkitLoaded()) {
             Player player = BukkitAPI.getPlayer(profile);

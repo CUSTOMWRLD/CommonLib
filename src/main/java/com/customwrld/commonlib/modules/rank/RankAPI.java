@@ -37,7 +37,7 @@ public class RankAPI {
             return rank;
         }
 
-        rank = new Rank("Default", 0, "&8[&7Default&8] &7", new Color(NamedTextColor.GRAY.value()));
+        rank = new Rank("Default", 0, "&8[&7Default&8] &7", "GRAY");
         rank.save();
 
         Rank.getRanks().put(rank.getUuid(), rank);
@@ -129,7 +129,7 @@ public class RankAPI {
             while (cursor.hasNext()) {
                 Document document = cursor.next();
 
-                Rank rank = Rank.getRank(UUID.fromString(document.getString("_id")));
+                Rank rank = Rank.getRank(UUID.fromString(document.getString("_id")), true);
 
                 List<UUID> ranksToInherit = document.getList("inherits", String.class).
                         stream()
@@ -140,7 +140,7 @@ public class RankAPI {
         }
 
         inheritanceReferences.forEach((rank, list) -> list.forEach(uuid -> {
-            Rank inherited = Rank.getRank(uuid);
+            Rank inherited = Rank.getRank(uuid, true);
 
             if (inherited != null) {
                 rank.getInherited().add(inherited);

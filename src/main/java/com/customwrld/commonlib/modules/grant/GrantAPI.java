@@ -16,11 +16,11 @@ public class GrantAPI {
     }
 
     public static Comparator<Grant> COMPARATOR = (grant1, grant2) -> {
-        Rank rank1 = Rank.getRank(grant1.getRankUUID());
-        Rank rank2 = Rank.getRank(grant2.getRankUUID());
+        Rank rank1 = Rank.getRank(grant1.getRankUUID(), true);
+        Rank rank2 = Rank.getRank(grant2.getRankUUID(), true);
 
         if(rank1 != null && rank2 != null) {
-            return rank2.getWeight() - rank1.getWeight();
+            return rank1.getWeight() - rank2.getWeight();
         }
 
         return 0;
@@ -99,7 +99,7 @@ public class GrantAPI {
      * Returns the Rank from the Grant.
      */
     public Rank getRank() {
-        return Rank.getRank(this.grant.getRankUUID());
+        return Rank.getRank(this.grant.getRankUUID(), true);
     }
 
 }

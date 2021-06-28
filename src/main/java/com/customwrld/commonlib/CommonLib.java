@@ -1,5 +1,7 @@
 package com.customwrld.commonlib;
 
+import com.customwrld.commonlib.modules.api.GrantProvider;
+import com.customwrld.commonlib.modules.api.PunishmentProvider;
 import com.customwrld.commonlib.modules.pigeon.Listeners;
 import com.customwrld.commonlib.modules.rank.RankAPI;
 import com.customwrld.pigeon.Pigeon;
@@ -11,6 +13,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 public class CommonLib {
 
@@ -21,9 +26,14 @@ public class CommonLib {
     private final MongoClient mongoClient;
     private final MongoDatabase mongoDatabase;
     private final Pigeon pigeon;
+    private final Set<GrantProvider> grantProviders;
+    private final Set<PunishmentProvider> punishmentProviders;
 
     public CommonLib(MongoClient mongoClient, MongoDatabase mongoDatabase, Pigeon pigeon) {
         commonLib = this;
+
+        this.grantProviders = new HashSet<>();
+        this.punishmentProviders = new HashSet<>();
 
         this.mongoClient = mongoClient;
         this.mongoDatabase = mongoDatabase;
