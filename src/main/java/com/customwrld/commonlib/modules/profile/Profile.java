@@ -38,10 +38,10 @@ public class Profile {
     private String searchableName;
     private String currentAddress;
     private String discordId;
-    private Integer gold;
+    private int gold;
     private Long firstSeen;
     private Long lastSeen;
-    private Long experience;
+    private long experience;
     private Map<Gamemode, GamemodeStorage> gamemodeStorages;
     @Accessors(fluent = true)
     private final ProfileAPI api;
@@ -129,12 +129,12 @@ public class Profile {
 
             this.gold = document.getInteger("gold");
 
+            this.experience = document.getLong("experience");
+
             this.gamemodeStorages.clear();
             for(Map.Entry<String, Object> ent : document.get("gamemodeStorage", Document.class).entrySet()) {
                 Gamemode.getByName(ent.getKey(), gamemode -> this.gamemodeStorages.put(gamemode, new GamemodeStorage(ent.getKey(), (Document) ent.getValue())));
             }
-
-            this.experience = document.getLong("experience");
 
             this.ignored.clear();
             for (String ignored : document.getList("ignored", String.class)) {
