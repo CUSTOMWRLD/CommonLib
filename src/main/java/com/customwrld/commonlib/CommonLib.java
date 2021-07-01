@@ -39,8 +39,8 @@ public class CommonLib {
         this.mongoDatabase = mongoDatabase;
         this.pigeon = pigeon;
 
-        this.pigeon.getPayloadsRegistry()
-                .registerPayloadsInPackage("com.customwrld.commonlib.modules.pigeon.converters");
+        this.pigeon.getConvertersRegistry()
+                .registerConvertersInPackage("com.customwrld.commonlib.modules.pigeon.converters");
 
         this.pigeon.getPayloadsRegistry()
                 .registerPayloadsInPackage("com.customwrld.commonlib.modules.pigeon.payloads");
