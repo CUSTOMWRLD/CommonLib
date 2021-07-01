@@ -46,7 +46,7 @@ public class Gamemode {
         }));
     }
 
-    public static void register(Gamemode gamemode, @Nullable Consumer<Boolean> callback) {
+    public static void register(@NotNull Gamemode gamemode, @Nullable Consumer<Boolean> callback) {
         getByName(gamemode.getName(), otherGamemode -> {
             if(otherGamemode == null) {
                 cachedGamemodes.add(gamemode);
