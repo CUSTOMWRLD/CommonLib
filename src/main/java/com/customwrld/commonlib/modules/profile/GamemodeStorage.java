@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
-import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,27 +99,27 @@ public class GamemodeStorage {
         }
 
         public int asInt() {
-            return NumberConversions.toInt(this.value);
+            return (int) this.value;
         }
 
         public float asFloat() {
-            return NumberConversions.toFloat(this.value);
+            return (float) this.value;
         }
 
         public double asDouble() {
-            return NumberConversions.toDouble(this.value);
+            return (double) this.value;
         }
 
         public long asLong() {
-            return NumberConversions.toLong(this.value);
+            return (long) this.value;
         }
 
         public short asShort() {
-            return NumberConversions.toShort(this.value);
+            return (short) this.value;
         }
 
         public byte asByte() {
-            return NumberConversions.toByte(this.value);
+            return (byte) this.value;
         }
 
         public boolean asBoolean() {

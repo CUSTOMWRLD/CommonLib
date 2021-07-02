@@ -1,7 +1,6 @@
 package com.customwrld.commonlib.modules.profile;
 
 import com.customwrld.commonlib.CommonLib;
-import com.customwrld.commonlib.modules.bukkit.BukkitAPI;
 import com.customwrld.commonlib.modules.grant.Grant;
 import com.customwrld.commonlib.modules.grant.GrantAPI;
 import com.customwrld.commonlib.modules.network.Gamemode;
@@ -9,6 +8,9 @@ import com.customwrld.commonlib.modules.pigeon.payloads.*;
 import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.commonlib.modules.rank.Rank;
 import com.customwrld.commonlib.modules.rank.RankAPI;
+import com.customwrld.commonlib.util.MC;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -288,6 +290,20 @@ public class ProfileAPI {
         }
 
         return anyEnsured;
+    }
+
+    public Component getChatFormat() {
+        return getColoredPrefix().append(this.getColoredName());
+    }
+
+    public Component getColoredName() {
+        Rank rank = this.profile.api().getActiveGrant().api().getRank();
+        return Component.text(this.profile.getName()).color(TextColor.color(rank.api().getRankColor().getRGB()));
+    }
+
+    public Component getColoredPrefix() {
+        Rank rank = this.profile.api().getActiveGrant().api().getRank();
+        return rank.getPrefix() != null ? MC.Style.fromLegacy(rank.getPrefix()) : Component.empty();
     }
 
 }

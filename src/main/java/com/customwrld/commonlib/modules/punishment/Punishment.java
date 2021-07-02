@@ -110,7 +110,6 @@ public class Punishment {
     @Getter
     @AllArgsConstructor
     public enum Type {
-
         BLACKLIST("Blacklist", "blacklisted", "unblacklisted", true, true),
         BAN("Ban", "banned", "unbanned", true, true),
         MUTE("Mute", "muted", "unmuted", false, true),
@@ -121,7 +120,6 @@ public class Punishment {
         private final String undoContext;
         private final boolean ban;
         private final boolean removable;
-
     }
 
 }

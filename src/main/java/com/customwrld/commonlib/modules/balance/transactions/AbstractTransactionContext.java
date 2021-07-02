@@ -5,23 +5,23 @@ import com.customwrld.commonlib.modules.network.Gamemode;
 import com.customwrld.commonlib.modules.profile.Profile;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter @Setter
 public abstract class AbstractTransactionContext {
 
-    private final Player player;
+    private final UUID playerUUID;
     private final Gamemode gamemode;
     private final List<TransactionEntry> entries;
     private final Map<String, String> data;
     private long timestamp;
 
-    public AbstractTransactionContext(Player player, Gamemode gamemode, List<TransactionEntry> entries) {
-        this.player = player;
+    public AbstractTransactionContext(UUID playerUUID, Gamemode gamemode, List<TransactionEntry> entries) {
+        this.playerUUID = playerUUID;
         this.gamemode = gamemode;
         this.entries = entries;
 
@@ -29,7 +29,7 @@ public abstract class AbstractTransactionContext {
     }
 
     public Transaction generateTransaction() {
-        return new Transaction(null, player.getUniqueId(), entries, timestamp, data);
+        return new Transaction(null, playerUUID, entries, timestamp, data);
     }
 
     public Map<Currencies.CurrencyType, Integer> getTotals() {
@@ -43,7 +43,7 @@ public abstract class AbstractTransactionContext {
     }
 
     public boolean process(boolean needsEnoughBalance, boolean logTransaction) {
-        Profile profile = Profile.getProfile(this.player.getUniqueId());
+        Profile profile = Profile.getProfile(playerUUID);
         Map<Currencies.CurrencyType, Integer> totals = getTotals();
         if (needsEnoughBalance) {
             for (Map.Entry<Currencies.CurrencyType, Integer> ent : totals.entrySet()) {

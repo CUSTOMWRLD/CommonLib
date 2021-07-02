@@ -1,6 +1,6 @@
 package com.customwrld.commonlib.modules.balance;
 
-import org.bukkit.util.noise.SimplexNoiseGenerator;
+import com.customwrld.commonlib.util.FastNoiseLite;
 
 import java.awt.*;
 
@@ -11,7 +11,8 @@ public class Levels {
 //    public static final ComponentFormatting EXP_FORMAT = ComponentFormatting.builder().color(ChatColor.AQUA).build();
 //    public static final ComponentFormatting LEVELS_FORMAT = EXP_FORMAT;
 
-    private static final SimplexNoiseGenerator noiseGenerator = new SimplexNoiseGenerator(3371012348295728621L);
+    private static final FastNoiseLite noiseGenerator = new FastNoiseLite(337101234);
+//    private static final SimplexNoiseGenerator noiseGenerator = new SimplexNoiseGenerator(3371012348295728621L);
 
     public static String getLevelAffix(int level) {
         return "level" + (level > 1 ? "s" : "");
@@ -26,9 +27,9 @@ public class Levels {
     }
 
     public static Color getLevelColor(int level) {
-        float h = (((float) noiseGenerator.noise(level / 20.0)) + 1f) / 2f;
-        float s = 0.5f + (((((float) noiseGenerator.noise(0, level / 5.0)) + 1f) / 2f) / 2f);
-        float b = 0.5f + (((((float) noiseGenerator.noise(0, 0, level / 5.0)) + 1f) / 2f) / 2f);
+        float h = (noiseGenerator.GetNoise(level / 20f, 0f) + 1f) / 2f;
+        float s = 0.5f + (((noiseGenerator.GetNoise(0, level / 5f) + 1f) / 2f) / 2f);
+        float b = 0.5f + (((noiseGenerator.GetNoise(0, 0, level / 5f) + 1f) / 2f) / 2f);
         return Color.getHSBColor(h, s, b);
     }
 

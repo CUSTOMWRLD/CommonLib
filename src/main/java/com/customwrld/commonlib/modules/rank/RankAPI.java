@@ -1,5 +1,6 @@
 package com.customwrld.commonlib.modules.rank;
 
+import com.customwrld.commonlib.util.MC;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -115,6 +116,10 @@ public class RankAPI {
         }
 
         return permissions;
+    }
+
+    public Color getRankColor() {
+        return MC.CC.valueOf(this.rank.getColor()).getColor();
     }
 
     /**

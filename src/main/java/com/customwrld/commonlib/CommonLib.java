@@ -5,13 +5,10 @@ import com.customwrld.commonlib.modules.api.PunishmentProvider;
 import com.customwrld.commonlib.modules.pigeon.Listeners;
 import com.customwrld.commonlib.modules.rank.RankAPI;
 import com.customwrld.pigeon.Pigeon;
-import com.customwrld.pigeon.listeners.Listener;
-import com.customwrld.pigeon.payloads.bases.BasePayload;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,8 +17,6 @@ import java.util.Set;
 public class CommonLib {
 
     @Getter private static CommonLib commonLib;
-//    @Setter private Plugin plugin;
-    @Setter private boolean bukkitLoaded;
 
     private final MongoClient mongoClient;
     private final MongoDatabase mongoDatabase;
