@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -93,11 +94,7 @@ public class MC {
             return null;
         }
 
-        public static String translateLegacy(String text) {
-            if(text == null || text.isBlank() || text.isEmpty()) {
-                throw new RuntimeException("Cannot translate null text");
-            }
-
+        public static String translateLegacy(@NotNull String text) {
             char[] array = text.toCharArray();
 
             for(int i = 0; i < array.length - 1; ++i) {
