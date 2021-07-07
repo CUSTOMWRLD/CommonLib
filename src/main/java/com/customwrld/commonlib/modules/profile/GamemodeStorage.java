@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GamemodeStorage {
-    @Getter private Gamemode gamemode;
+    @Getter private final Gamemode gamemode;
     @Getter private final Map<String, StorageValue> values = Collections.synchronizedMap(new HashMap<>());
 
     public GamemodeStorage(@NotNull Gamemode gamemode) {
@@ -21,7 +21,7 @@ public class GamemodeStorage {
     }
 
     public GamemodeStorage(String gamemodeName, Document document) {
-        Gamemode.getByName(gamemodeName, gamemode -> this.gamemode = gamemode);
+        this.gamemode = Gamemode.getByName(gamemodeName);
 
         for(Map.Entry<String, Object> ent : document.entrySet()) {
             String name = ent.getKey();

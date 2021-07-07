@@ -133,7 +133,7 @@ public class Profile {
 
             this.gamemodeStorages.clear();
             for(Map.Entry<String, Object> ent : document.get("gamemodeStorage", Document.class).entrySet()) {
-                Gamemode.getByName(ent.getKey(), gamemode -> this.gamemodeStorages.put(gamemode, new GamemodeStorage(ent.getKey(), (Document) ent.getValue())));
+                this.gamemodeStorages.put(Gamemode.getByName(ent.getKey()), new GamemodeStorage(ent.getKey(), (Document) ent.getValue()));
             }
 
             this.ignored.clear();
@@ -225,12 +225,13 @@ public class Profile {
 
     @Override
     public boolean equals(Object object) {
-        return object instanceof Profile && ((Profile) object).id.equals(this.id);
+        return object instanceof Profile other && other.id.equals(this.id);
     }
 
     @Getter @Setter
     public static class Options {
 
+        private boolean receivingPartyRequests = true;
         private boolean receivingFriendRequests = true;
         private boolean receivingPublicChat = true;
         private boolean receivingConversations = true;

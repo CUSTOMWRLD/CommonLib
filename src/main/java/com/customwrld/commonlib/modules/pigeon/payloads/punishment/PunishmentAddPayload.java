@@ -1,4 +1,4 @@
-package com.customwrld.commonlib.modules.pigeon.payloads;
+package com.customwrld.commonlib.modules.pigeon.payloads.punishment;
 
 import com.customwrld.pigeon.annotations.Payload;
 import com.customwrld.pigeon.annotations.Transmit;
@@ -11,7 +11,7 @@ public class PunishmentAddPayload extends BasePayload {
     @Transmit String punishment;
 
     public PunishmentAddPayload() {
-        payloadId = "common-punishmentAdd";
+        payloadId = "punishmentAddPayload";
     }
 
     public PunishmentAddPayload(String punishment) {

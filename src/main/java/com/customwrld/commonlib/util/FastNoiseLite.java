@@ -1,6 +1,7 @@
 package com.customwrld.commonlib.util;
 
 public class FastNoiseLite {
+
     private static final float[] Gradients2D = {
             0.130526192220052f, 0.99144486137381f, 0.38268343236509f, 0.923879532511287f, 0.608761429008721f, 0.793353340291235f, 0.793353340291235f, 0.608761429008721f,
             0.923879532511287f, 0.38268343236509f, 0.99144486137381f, 0.130526192220051f, 0.99144486137381f, -0.130526192220051f, 0.923879532511287f, -0.38268343236509f,
@@ -125,7 +126,6 @@ public class FastNoiseLite {
             -0.7870349638f, 0.03447489231f, 0.6159443543f, 0, -0.2015596421f, 0.6859872284f, 0.6991389226f, 0, -0.08581082512f, -0.10920836f, -0.9903080513f, 0, 0.5532693395f, 0.7325250401f, -0.396610771f, 0, -0.1842489331f, -0.9777375055f, -0.1004076743f, 0, 0.0775473789f, -0.9111505856f, 0.4047110257f, 0, 0.1399838409f, 0.7601631212f, -0.6344734459f, 0, 0.4484419361f, -0.845289248f, 0.2904925424f, 0
     };
 
-    // Hashing
     private static final int PrimeX = 501125321;
 
     private static final int PrimeY = 1136930381;
@@ -155,15 +155,8 @@ public class FastNoiseLite {
     private TransformType3D mWarpTransformType3D = TransformType3D.DefaultOpenSimplex2;
     private float mDomainWarpAmp = 1.0f;
 
-    /// <summary>
-    /// Create new FastNoise object with default seed
-    /// </summary>
-    public FastNoiseLite() {
-    }
+    public FastNoiseLite() {}
 
-    /// <summary>
-    /// Create new FastNoise object with specified seed
-    /// </summary>
     public FastNoiseLite(int seed) {
         SetSeed(seed);
     }
@@ -184,11 +177,11 @@ public class FastNoiseLite {
         return (float) Math.sqrt(f);
     }
 
-    private static int FastFloor(/*FNLfloat*/ float f) {
+    private static int FastFloor(float f) {
         return f >= 0 ? (int) f : (int) f - 1;
     }
 
-    private static int FastRound(/*FNLfloat*/ float f) {
+    private static int FastRound(float f) {
         return f >= 0 ? (int) (f + 0.5f) : (int) (f - 0.5f);
     }
 
@@ -267,182 +260,81 @@ public class FastNoiseLite {
         return xd * xg + yd * yg + zd * zg;
     }
 
-    /// <summary>
-    /// Sets seed used for all noise types
-    /// </summary>
-    /// <remarks>
-    /// Default: 1337
-    /// </remarks>
     public void SetSeed(int seed) {
         mSeed = seed;
     }
 
-    /// <summary>
-    /// Sets frequency for all noise types
-    /// </summary>
-    /// <remarks>
-    /// Default: 0.01
-    /// </remarks>
     public void SetFrequency(float frequency) {
         mFrequency = frequency;
     }
 
-    /// <summary>
-    /// Sets noise algorithm used for GetNoise(...)
-    /// </summary>
-    /// <remarks>
-    /// Default: OpenSimplex2
-    /// </remarks>
     public void SetNoiseType(NoiseType noiseType) {
         mNoiseType = noiseType;
         UpdateTransformType3D();
     }
 
-    /// <summary>
-    /// Sets domain rotation type for 3D Noise and 3D DomainWarp.
-    /// Can aid in reducing directional artifacts when sampling a 2D plane in 3D
-    /// </summary>
-    /// <remarks>
-    /// Default: None
-    /// </remarks>
     public void SetRotationType3D(RotationType3D rotationType3D) {
         mRotationType3D = rotationType3D;
         UpdateTransformType3D();
         UpdateWarpTransformType3D();
     }
 
-    /// <summary>
-    /// Sets method for combining octaves in all fractal noise types
-    /// </summary>
-    /// <remarks>
-    /// Default: None
-    /// Note: FractalType.DomainWarp... only affects DomainWarp(...)
-    /// </remarks>
     public void SetFractalType(FractalType fractalType) {
         mFractalType = fractalType;
     }
 
-    /// <summary>
-    /// Sets octave count for all fractal noise types
-    /// </summary>
-    /// <remarks>
-    /// Default: 3
-    /// </remarks>
     public void SetFractalOctaves(int octaves) {
         mOctaves = octaves;
         CalculateFractalBounding();
     }
 
-    /// <summary>
-    /// Sets octave lacunarity for all fractal noise types
-    /// </summary>
-    /// <remarks>
-    /// Default: 2.0
-    /// </remarks>
     public void SetFractalLacunarity(float lacunarity) {
         mLacunarity = lacunarity;
     }
 
-    /// <summary>
-    /// Sets octave gain for all fractal noise types
-    /// </summary>
-    /// <remarks>
-    /// Default: 0.5
-    /// </remarks>
     public void SetFractalGain(float gain) {
         mGain = gain;
         CalculateFractalBounding();
     }
 
-    /// <summary>
-    /// Sets octave weighting for all none DomainWarp fratal types
-    /// </summary>
-    /// <remarks>
-    /// Default: 0.0
-    /// Note: Keep between 0...1 to maintain -1...1 output bounding
-    /// </remarks>
     public void SetFractalWeightedStrength(float weightedStrength) {
         mWeightedStrength = weightedStrength;
     }
 
-    /// <summary>
-    /// Sets strength of the fractal ping pong effect
-    /// </summary>
-    /// <remarks>
-    /// Default: 2.0
-    /// </remarks>
     public void SetFractalPingPongStrength(float pingPongStrength) {
         mPingPongStength = pingPongStrength;
     }
 
-    /// <summary>
-    /// Sets distance function used in cellular noise calculations
-    /// </summary>
-    /// <remarks>
-    /// Default: Distance
-    /// </remarks>
     public void SetCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) {
         mCellularDistanceFunction = cellularDistanceFunction;
     }
 
-    /// <summary>
-    /// Sets return type from cellular noise calculations
-    /// </summary>
-    /// <remarks>
-    /// Default: EuclideanSq
-    /// </remarks>
     public void SetCellularReturnType(CellularReturnType cellularReturnType) {
         mCellularReturnType = cellularReturnType;
     }
 
-    /// <summary>
-    /// Sets the maximum distance a cellular point can move from it's grid position
-    /// </summary>
-    /// <remarks>
-    /// Default: 1.0
-    /// Note: Setting this higher than 1 will cause artifacts
-    /// </remarks>
     public void SetCellularJitter(float cellularJitter) {
         mCellularJitterModifier = cellularJitter;
     }
 
-    /// <summary>
-    /// Sets the warp algorithm when using DomainWarp(...)
-    /// </summary>
-    /// <remarks>
-    /// Default: OpenSimplex2
-    /// </remarks>
     public void SetDomainWarpType(DomainWarpType domainWarpType) {
         mDomainWarpType = domainWarpType;
         UpdateWarpTransformType3D();
     }
 
-    /// <summary>
-    /// Sets the maximum warp distance from original position when using DomainWarp(...)
-    /// </summary>
-    /// <remarks>
-    /// Default: 1.0
-    /// </remarks>
     public void SetDomainWarpAmp(float domainWarpAmp) {
         mDomainWarpAmp = domainWarpAmp;
     }
 
-    /// <summary>
-    /// 2D noise at given position using current settings
-    /// </summary>
-    /// <returns>
-    /// Noise output bounded between -1...1
-    /// </returns>
-    public float GetNoise(/*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    public float GetNoise(float x, float y) {
         x *= mFrequency;
         y *= mFrequency;
 
         switch (mNoiseType) {
             case OpenSimplex2:
             case OpenSimplex2S: {
-                final /*FNLfloat*/ float SQRT3 = (/*FNLfloat*/ float) 1.7320508075688772935274463415059;
-                final /*FNLfloat*/ float F2 = 0.5f * (SQRT3 - 1);
-                /*FNLfloat*/
+                final float SQRT3 = (float) 1.7320508075688772935274463415059;
+                final float F2 = 0.5f * (SQRT3 - 1);
                 float t = (x + y) * F2;
                 x += t;
                 y += t;
@@ -460,44 +352,33 @@ public class FastNoiseLite {
         };
     }
 
-    /// <summary>
-    /// 3D noise at given position using current settings
-    /// </summary>
-    /// <returns>
-    /// Noise output bounded between -1...1
-    /// </returns>
-    public float GetNoise(/*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    public float GetNoise(float x, float y, float z) {
         x *= mFrequency;
         y *= mFrequency;
         z *= mFrequency;
 
         switch (mTransformType3D) {
             case ImproveXYPlanes: {
-                /*FNLfloat*/
                 float xy = x + y;
-                /*FNLfloat*/
-                float s2 = xy * -(/*FNLfloat*/ float) 0.211324865405187;
-                z *= (/*FNLfloat*/ float) 0.577350269189626;
+                float s2 = xy * -(float) 0.211324865405187;
+                z *= (float) 0.577350269189626;
                 x += s2 - z;
                 y = y + s2 - z;
-                z += xy * (/*FNLfloat*/ float) 0.577350269189626;
+                z += xy * (float) 0.577350269189626;
             }
             break;
             case ImproveXZPlanes: {
-                /*FNLfloat*/
                 float xz = x + z;
-                /*FNLfloat*/
-                float s2 = xz * -(/*FNLfloat*/ float) 0.211324865405187;
-                y *= (/*FNLfloat*/ float) 0.577350269189626;
+                float s2 = xz * -(float) 0.211324865405187;
+                y *= (float) 0.577350269189626;
                 x += s2 - y;
                 z += s2 - y;
-                y += xz * (/*FNLfloat*/ float) 0.577350269189626;
+                y += xz * (float) 0.577350269189626;
             }
             break;
             case DefaultOpenSimplex2: {
-                final /*FNLfloat*/ float R3 = (/*FNLfloat*/ float) (2.0 / 3.0);
-                /*FNLfloat*/
-                float r = (x + y + z) * R3; // Rotation, not skew
+                final float R3 = (float) (2.0 / 3.0);
+                float r = (x + y + z) * R3;
                 x = r - x;
                 y = r - y;
                 z = r - z;
@@ -515,14 +396,6 @@ public class FastNoiseLite {
         };
     }
 
-    /// <summary>
-    /// 2D warps the input position using current domain warp settings
-    /// </summary>
-    /// <example>
-    /// Example usage with GetNoise
-    /// <code>DomainWarp(coord)
-    /// noise = GetNoise(x, y)</code>
-    /// </example>
     public void DomainWarp(Vector2 coord) {
         switch (mFractalType) {
             default -> DomainWarpSingle(coord);
@@ -531,14 +404,6 @@ public class FastNoiseLite {
         }
     }
 
-    /// <summary>
-    /// 3D warps the input position using current domain warp settings
-    /// </summary>
-    /// <example>
-    /// Example usage with GetNoise
-    /// <code>DomainWarp(coord)
-    /// noise = GetNoise(x, y, z)</code>
-    /// </example>
     public void DomainWarp(Vector3 coord) {
         switch (mFractalType) {
             default -> DomainWarpSingle(coord);
@@ -558,7 +423,7 @@ public class FastNoiseLite {
         mFractalBounding = 1 / ampFractal;
     }
 
-    private float GenNoiseSingle(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float GenNoiseSingle(int seed, float x, float y) {
         return switch (mNoiseType) {
             case OpenSimplex2 -> SingleSimplex(seed, x, y);
             case OpenSimplex2S -> SingleOpenSimplex2S(seed, x, y);
@@ -566,11 +431,10 @@ public class FastNoiseLite {
             case Perlin -> SinglePerlin(seed, x, y);
             case ValueCubic -> SingleValueCubic(seed, x, y);
             case Value -> SingleValue(seed, x, y);
-            default -> 0;
         };
     }
 
-    private float GenNoiseSingle(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float GenNoiseSingle(int seed, float x, float y, float z) {
         return switch (mNoiseType) {
             case OpenSimplex2 -> SingleOpenSimplex2(seed, x, y, z);
             case OpenSimplex2S -> SingleOpenSimplex2S(seed, x, y, z);
@@ -615,7 +479,7 @@ public class FastNoiseLite {
         }
     }
 
-    private float GenFractalFBm(/*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float GenFractalFBm(float x, float y) {
         int seed = mSeed;
         float sum = 0;
         float amp = mFractalBounding;
@@ -633,7 +497,7 @@ public class FastNoiseLite {
         return sum;
     }
 
-    private float GenFractalFBm(/*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float GenFractalFBm(float x, float y, float z) {
         int seed = mSeed;
         float sum = 0;
         float amp = mFractalBounding;
@@ -652,7 +516,7 @@ public class FastNoiseLite {
         return sum;
     }
 
-    private float GenFractalRidged(/*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float GenFractalRidged(float x, float y) {
         int seed = mSeed;
         float sum = 0;
         float amp = mFractalBounding;
@@ -670,10 +534,7 @@ public class FastNoiseLite {
         return sum;
     }
 
-
-    // Generic noise gen
-
-    private float GenFractalRidged(/*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float GenFractalRidged(float x, float y, float z) {
         int seed = mSeed;
         float sum = 0;
         float amp = mFractalBounding;
@@ -692,7 +553,7 @@ public class FastNoiseLite {
         return sum;
     }
 
-    private float GenFractalPingPong(/*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float GenFractalPingPong(float x, float y) {
         int seed = mSeed;
         float sum = 0;
         float amp = mFractalBounding;
@@ -710,10 +571,7 @@ public class FastNoiseLite {
         return sum;
     }
 
-
-    // Noise Coordinate Transforms (frequency, and possible skew or rotation)
-
-    private float GenFractalPingPong(/*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float GenFractalPingPong(float x, float y, float z) {
         int seed = mSeed;
         float sum = 0;
         float amp = mFractalBounding;
@@ -732,18 +590,9 @@ public class FastNoiseLite {
         return sum;
     }
 
-    private float SingleSimplex(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y) {
-        // 2D OpenSimplex2 case uses the same algorithm as ordinary Simplex.
-
+    private float SingleSimplex(int seed, float x, float y) {
         final float SQRT3 = 1.7320508075688772935274463415059f;
         final float G2 = (3 - SQRT3) / 6;
-
-        /*
-         * --- Skew moved to switch statements before fractal evaluation ---
-         * final FNLfloat F2 = 0.5f * (SQRT3 - 1);
-         * FNLfloat s = (x + y) * F2;
-         * x += s; y += s;
-         */
 
         int i = FastFloor(x);
         int j = FastFloor(y);
@@ -794,19 +643,7 @@ public class FastNoiseLite {
         return (n0 + n1 + n2) * 99.83685446303647f;
     }
 
-
-    // Fractal FBm
-
-    private float SingleOpenSimplex2(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
-        // 3D OpenSimplex2 case uses two offset rotated cube grids.
-
-        /*
-         * --- Rotation moved to switch statements before fractal evaluation ---
-         * final FNLfloat R3 = (FNLfloat)(2.0 / 3.0);
-         * FNLfloat r = (x + y + z) * R3; // Rotation, not skew
-         * x = r - x; y = r - y; z = r - z;
-         */
-
+    private float SingleOpenSimplex2(int seed, float x, float y, float z) {
         int i = FastRound(x);
         int j = FastRound(y);
         int k = FastRound(z);
@@ -880,18 +717,9 @@ public class FastNoiseLite {
         return value * 32.69428253173828125f;
     }
 
-    private float SingleOpenSimplex2S(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y) {
-        // 2D OpenSimplex2S case is a modified 2D simplex noise.
-
-        final /*FNLfloat*/ float SQRT3 = (/*FNLfloat*/ float) 1.7320508075688772935274463415059;
-        final /*FNLfloat*/ float G2 = (3 - SQRT3) / 6;
-
-        /*
-         * --- Skew moved to TransformNoiseCoordinate method ---
-         * final FNLfloat F2 = 0.5f * (SQRT3 - 1);
-         * FNLfloat s = (x + y) * F2;
-         * x += s; y += s;
-         */
+    private float SingleOpenSimplex2S(int seed, float x, float y) {
+        final float SQRT3 = (float) 1.7320508075688772935274463415059;
+        final float G2 = (3 - SQRT3) / 6;
 
         int i = FastFloor(x);
         int j = FastFloor(y);
@@ -915,7 +743,6 @@ public class FastNoiseLite {
         float y1 = y0 - (1 - 2 * G2);
         value += (a1 * a1) * (a1 * a1) * GradCoord(seed, i1, j1, x1, y1);
 
-        // Nested conditionals were faster than compact bit logic/arithmetic.
         float xmyi = xi - yi;
         if (t > G2) {
             if (xi + xmyi > 1) {
@@ -986,19 +813,7 @@ public class FastNoiseLite {
         return value * 18.24196194486065f;
     }
 
-
-    // Fractal Ridged
-
-    private float SingleOpenSimplex2S(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
-        // 3D OpenSimplex2S case uses two offset rotated cube grids.
-
-        /*
-         * --- Rotation moved to TransformNoiseCoordinate method ---
-         * final FNLfloat R3 = (FNLfloat)(2.0 / 3.0);
-         * FNLfloat r = (x + y + z) * R3; // Rotation, not skew
-         * x = r - x; y = r - y; z = r - z;
-         */
-
+    private float SingleOpenSimplex2S(int seed, float x, float y, float z) {
         int i = FastFloor(x);
         int j = FastFloor(y);
         int k = FastFloor(z);
@@ -1159,7 +974,7 @@ public class FastNoiseLite {
         return value * 9.046026385208288f;
     }
 
-    private float SingleCellular(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float SingleCellular(int seed, float x, float y) {
         int xr = FastRound(x);
         int yr = FastRound(y);
 
@@ -1249,35 +1064,21 @@ public class FastNoiseLite {
         if (mCellularDistanceFunction == CellularDistanceFunction.Euclidean && mCellularReturnType != CellularReturnType.CellValue) {
             distance0 = FastSqrt(distance0);
 
-            if (mCellularReturnType != CellularReturnType.CellValue) {
-                distance1 = FastSqrt(distance1);
-            }
+            distance1 = FastSqrt(distance1);
         }
 
-        switch (mCellularReturnType) {
-            case CellValue:
-                return closestHash * (1 / 2147483648.0f);
-            case Distance:
-                return distance0 - 1;
-            case Distance2:
-                return distance1 - 1;
-            case Distance2Add:
-                return (distance1 + distance0) * 0.5f - 1;
-            case Distance2Sub:
-                return distance1 - distance0 - 1;
-            case Distance2Mul:
-                return distance1 * distance0 * 0.5f - 1;
-            case Distance2Div:
-                return distance0 / distance1 - 1;
-            default:
-                return 0;
-        }
+        return switch (mCellularReturnType) {
+            case CellValue -> closestHash * (1 / 2147483648.0f);
+            case Distance -> distance0 - 1;
+            case Distance2 -> distance1 - 1;
+            case Distance2Add -> (distance1 + distance0) * 0.5f - 1;
+            case Distance2Sub -> distance1 - distance0 - 1;
+            case Distance2Mul -> distance1 * distance0 * 0.5f - 1;
+            case Distance2Div -> distance0 / distance1 - 1;
+        };
     }
 
-
-    // Fractal PingPong 
-
-    private float SingleCellular(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float SingleCellular(int seed, float x, float y, float z) {
         int xr = FastRound(x);
         int yr = FastRound(y);
         int zr = FastRound(z);
@@ -1388,32 +1189,21 @@ public class FastNoiseLite {
         if (mCellularDistanceFunction == CellularDistanceFunction.Euclidean && mCellularReturnType != CellularReturnType.CellValue) {
             distance0 = FastSqrt(distance0);
 
-            if (mCellularReturnType != CellularReturnType.CellValue) {
-                distance1 = FastSqrt(distance1);
-            }
+            distance1 = FastSqrt(distance1);
         }
 
-        switch (mCellularReturnType) {
-            case CellValue:
-                return closestHash * (1 / 2147483648.0f);
-            case Distance:
-                return distance0 - 1;
-            case Distance2:
-                return distance1 - 1;
-            case Distance2Add:
-                return (distance1 + distance0) * 0.5f - 1;
-            case Distance2Sub:
-                return distance1 - distance0 - 1;
-            case Distance2Mul:
-                return distance1 * distance0 * 0.5f - 1;
-            case Distance2Div:
-                return distance0 / distance1 - 1;
-            default:
-                return 0;
-        }
+        return switch (mCellularReturnType) {
+            case CellValue -> closestHash * (1 / 2147483648.0f);
+            case Distance -> distance0 - 1;
+            case Distance2 -> distance1 - 1;
+            case Distance2Add -> (distance1 + distance0) * 0.5f - 1;
+            case Distance2Sub -> distance1 - distance0 - 1;
+            case Distance2Mul -> distance1 * distance0 * 0.5f - 1;
+            case Distance2Div -> distance0 / distance1 - 1;
+        };
     }
 
-    private float SinglePerlin(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float SinglePerlin(int seed, float x, float y) {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
 
@@ -1436,10 +1226,7 @@ public class FastNoiseLite {
         return Lerp(xf0, xf1, ys) * 1.4247691104677813f;
     }
 
-
-    // Simplex/OpenSimplex2 Noise
-
-    private float SinglePerlin(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float SinglePerlin(int seed, float x, float y, float z) {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
         int z0 = FastFloor(z);
@@ -1473,7 +1260,7 @@ public class FastNoiseLite {
         return Lerp(yf0, yf1, zs) * 0.964921414852142333984375f;
     }
 
-    private float SingleValueCubic(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float SingleValueCubic(int seed, float x, float y) {
         int x1 = FastFloor(x);
         int y1 = FastFloor(y);
 
@@ -1501,10 +1288,7 @@ public class FastNoiseLite {
                 ys) * (1 / (1.5f * 1.5f));
     }
 
-
-    // OpenSimplex2S Noise
-
-    private float SingleValueCubic(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float SingleValueCubic(int seed, float x, float y, float z) {
         int x1 = FastFloor(x);
         int y1 = FastFloor(y);
         int z1 = FastFloor(z);
@@ -1556,7 +1340,7 @@ public class FastNoiseLite {
                 zs) * (1 / (1.5f * 1.5f * 1.5f));
     }
 
-    private float SingleValue(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+    private float SingleValue(int seed, float x, float y) {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
 
@@ -1574,10 +1358,7 @@ public class FastNoiseLite {
         return Lerp(xf0, xf1, ys);
     }
 
-
-    // Cellular Noise
-
-    private float SingleValue(int seed, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+    private float SingleValue(int seed, float x, float y, float z) {
         int x0 = FastFloor(x);
         int y0 = FastFloor(y);
         int z0 = FastFloor(z);
@@ -1604,34 +1385,19 @@ public class FastNoiseLite {
         return Lerp(yf0, yf1, zs);
     }
 
-    private void DoSingleDomainWarp(int seed, float amp, float freq, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vector2 coord) {
+    private void DoSingleDomainWarp(int seed, float amp, float freq, float x, float y, Vector2 coord) {
         switch (mDomainWarpType) {
-            case OpenSimplex2:
-                SingleDomainWarpSimplexGradient(seed, amp * 38.283687591552734375f, freq, x, y, coord, false);
-                break;
-            case OpenSimplex2Reduced:
-                SingleDomainWarpSimplexGradient(seed, amp * 16.0f, freq, x, y, coord, true);
-                break;
-            case BasicGrid:
-                SingleDomainWarpBasicGrid(seed, amp, freq, x, y, coord);
-                break;
+            case OpenSimplex2 -> SingleDomainWarpSimplexGradient(seed, amp * 38.283687591552734375f, freq, x, y, coord, false);
+            case OpenSimplex2Reduced -> SingleDomainWarpSimplexGradient(seed, amp * 16.0f, freq, x, y, coord, true);
+            case BasicGrid -> SingleDomainWarpBasicGrid(seed, amp, freq, x, y, coord);
         }
     }
 
-
-    // Perlin Noise
-
-    private void DoSingleDomainWarp(int seed, float amp, float freq, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vector3 coord) {
+    private void DoSingleDomainWarp(int seed, float amp, float freq, float x, float y, float z, Vector3 coord) {
         switch (mDomainWarpType) {
-            case OpenSimplex2:
-                SingleDomainWarpOpenSimplex2Gradient(seed, amp * 32.69428253173828125f, freq, x, y, z, coord, false);
-                break;
-            case OpenSimplex2Reduced:
-                SingleDomainWarpOpenSimplex2Gradient(seed, amp * 7.71604938271605f, freq, x, y, z, coord, true);
-                break;
-            case BasicGrid:
-                SingleDomainWarpBasicGrid(seed, amp, freq, x, y, z, coord);
-                break;
+            case OpenSimplex2 -> SingleDomainWarpOpenSimplex2Gradient(seed, amp * 32.69428253173828125f, freq, x, y, z, coord, false);
+            case OpenSimplex2Reduced -> SingleDomainWarpOpenSimplex2Gradient(seed, amp * 7.71604938271605f, freq, x, y, z, coord, true);
+            case BasicGrid -> SingleDomainWarpBasicGrid(seed, amp, freq, x, y, z, coord);
         }
     }
 
@@ -1640,16 +1406,13 @@ public class FastNoiseLite {
         float amp = mDomainWarpAmp * mFractalBounding;
         float freq = mFrequency;
 
-        /*FNLfloat*/
         float xs = coord.x;
-        /*FNLfloat*/
         float ys = coord.y;
         switch (mDomainWarpType) {
             case OpenSimplex2:
             case OpenSimplex2Reduced: {
-                final /*FNLfloat*/ float SQRT3 = (/*FNLfloat*/ float) 1.7320508075688772935274463415059;
-                final /*FNLfloat*/ float F2 = 0.5f * (SQRT3 - 1);
-                /*FNLfloat*/
+                final float SQRT3 = (float) 1.7320508075688772935274463415059;
+                final float F2 = 0.5f * (SQRT3 - 1);
                 float t = (xs + ys) * F2;
                 xs += t;
                 ys += t;
@@ -1662,47 +1425,36 @@ public class FastNoiseLite {
         DoSingleDomainWarp(seed, amp, freq, xs, ys, coord);
     }
 
-
-    // Value Cubic Noise
-
     private void DomainWarpSingle(Vector3 coord) {
         int seed = mSeed;
         float amp = mDomainWarpAmp * mFractalBounding;
         float freq = mFrequency;
 
-        /*FNLfloat*/
         float xs = coord.x;
-        /*FNLfloat*/
         float ys = coord.y;
-        /*FNLfloat*/
         float zs = coord.z;
         switch (mWarpTransformType3D) {
             case ImproveXYPlanes: {
-                /*FNLfloat*/
                 float xy = xs + ys;
-                /*FNLfloat*/
-                float s2 = xy * -(/*FNLfloat*/ float) 0.211324865405187;
-                zs *= (/*FNLfloat*/ float) 0.577350269189626;
+                float s2 = xy * -(float) 0.211324865405187;
+                zs *= (float) 0.577350269189626;
                 xs += s2 - zs;
                 ys = ys + s2 - zs;
-                zs += xy * (/*FNLfloat*/ float) 0.577350269189626;
+                zs += xy * (float) 0.577350269189626;
             }
             break;
             case ImproveXZPlanes: {
-                /*FNLfloat*/
                 float xz = xs + zs;
-                /*FNLfloat*/
-                float s2 = xz * -(/*FNLfloat*/ float) 0.211324865405187;
-                ys *= (/*FNLfloat*/ float) 0.577350269189626;
+                float s2 = xz * -(float) 0.211324865405187;
+                ys *= (float) 0.577350269189626;
                 xs += s2 - ys;
                 zs += s2 - ys;
-                ys += xz * (/*FNLfloat*/ float) 0.577350269189626;
+                ys += xz * (float) 0.577350269189626;
             }
             break;
             case DefaultOpenSimplex2: {
-                final /*FNLfloat*/ float R3 = (/*FNLfloat*/ float) (2.0 / 3.0);
-                /*FNLfloat*/
-                float r = (xs + ys + zs) * R3; // Rotation, not skew
+                final float R3 = (float) (2.0 / 3.0);
+                float r = (xs + ys + zs) * R3;
                 xs = r - xs;
                 ys = r - ys;
                 zs = r - zs;
@@ -1721,16 +1473,13 @@ public class FastNoiseLite {
         float freq = mFrequency;
 
         for (int i = 0; i < mOctaves; i++) {
-            /*FNLfloat*/
             float xs = coord.x;
-            /*FNLfloat*/
             float ys = coord.y;
             switch (mDomainWarpType) {
                 case OpenSimplex2:
                 case OpenSimplex2Reduced: {
-                    final /*FNLfloat*/ float SQRT3 = (/*FNLfloat*/ float) 1.7320508075688772935274463415059;
-                    final /*FNLfloat*/ float F2 = 0.5f * (SQRT3 - 1);
-                    /*FNLfloat*/
+                    final float SQRT3 = (float) 1.7320508075688772935274463415059;
+                    final float F2 = 0.5f * (SQRT3 - 1);
                     float t = (xs + ys) * F2;
                     xs += t;
                     ys += t;
@@ -1748,48 +1497,37 @@ public class FastNoiseLite {
         }
     }
 
-
-    // Value Noise
-
     private void DomainWarpFractalProgressive(Vector3 coord) {
         int seed = mSeed;
         float amp = mDomainWarpAmp * mFractalBounding;
         float freq = mFrequency;
 
         for (int i = 0; i < mOctaves; i++) {
-            /*FNLfloat*/
             float xs = coord.x;
-            /*FNLfloat*/
             float ys = coord.y;
-            /*FNLfloat*/
             float zs = coord.z;
             switch (mWarpTransformType3D) {
                 case ImproveXYPlanes: {
-                    /*FNLfloat*/
                     float xy = xs + ys;
-                    /*FNLfloat*/
-                    float s2 = xy * -(/*FNLfloat*/ float) 0.211324865405187;
-                    zs *= (/*FNLfloat*/ float) 0.577350269189626;
+                    float s2 = xy * -(float) 0.211324865405187;
+                    zs *= (float) 0.577350269189626;
                     xs += s2 - zs;
                     ys = ys + s2 - zs;
-                    zs += xy * (/*FNLfloat*/ float) 0.577350269189626;
+                    zs += xy * (float) 0.577350269189626;
                 }
                 break;
                 case ImproveXZPlanes: {
-                    /*FNLfloat*/
                     float xz = xs + zs;
-                    /*FNLfloat*/
-                    float s2 = xz * -(/*FNLfloat*/ float) 0.211324865405187;
-                    ys *= (/*FNLfloat*/ float) 0.577350269189626;
+                    float s2 = xz * -(float) 0.211324865405187;
+                    ys *= (float) 0.577350269189626;
                     xs += s2 - ys;
                     zs += s2 - ys;
-                    ys += xz * (/*FNLfloat*/ float) 0.577350269189626;
+                    ys += xz * (float) 0.577350269189626;
                 }
                 break;
                 case DefaultOpenSimplex2: {
-                    final /*FNLfloat*/ float R3 = (/*FNLfloat*/ float) (2.0 / 3.0);
-                    /*FNLfloat*/
-                    float r = (xs + ys + zs) * R3; // Rotation, not skew
+                    final float R3 = (float) (2.0 / 3.0);
+                    float r = (xs + ys + zs) * R3;
                     xs = r - xs;
                     ys = r - ys;
                     zs = r - zs;
@@ -1807,18 +1545,14 @@ public class FastNoiseLite {
         }
     }
 
-    // Domain Warp Fractal Independant
     private void DomainWarpFractalIndependent(Vector2 coord) {
-        /*FNLfloat*/
         float xs = coord.x;
-        /*FNLfloat*/
         float ys = coord.y;
         switch (mDomainWarpType) {
             case OpenSimplex2:
             case OpenSimplex2Reduced: {
-                final /*FNLfloat*/ float SQRT3 = (/*FNLfloat*/ float) 1.7320508075688772935274463415059;
-                final /*FNLfloat*/ float F2 = 0.5f * (SQRT3 - 1);
-                /*FNLfloat*/
+                final float SQRT3 = (float) 1.7320508075688772935274463415059;
+                final float F2 = 0.5f * (SQRT3 - 1);
                 float t = (xs + ys) * F2;
                 xs += t;
                 ys += t;
@@ -1841,43 +1575,32 @@ public class FastNoiseLite {
         }
     }
 
-
-    // Domain Warp
-
     private void DomainWarpFractalIndependent(Vector3 coord) {
-        /*FNLfloat*/
         float xs = coord.x;
-        /*FNLfloat*/
         float ys = coord.y;
-        /*FNLfloat*/
         float zs = coord.z;
         switch (mWarpTransformType3D) {
             case ImproveXYPlanes: {
-                /*FNLfloat*/
                 float xy = xs + ys;
-                /*FNLfloat*/
-                float s2 = xy * -(/*FNLfloat*/ float) 0.211324865405187;
-                zs *= (/*FNLfloat*/ float) 0.577350269189626;
+                float s2 = xy * -(float) 0.211324865405187;
+                zs *= (float) 0.577350269189626;
                 xs += s2 - zs;
                 ys = ys + s2 - zs;
-                zs += xy * (/*FNLfloat*/ float) 0.577350269189626;
+                zs += xy * (float) 0.577350269189626;
             }
             break;
             case ImproveXZPlanes: {
-                /*FNLfloat*/
                 float xz = xs + zs;
-                /*FNLfloat*/
-                float s2 = xz * -(/*FNLfloat*/ float) 0.211324865405187;
-                ys *= (/*FNLfloat*/ float) 0.577350269189626;
+                float s2 = xz * -(float) 0.211324865405187;
+                ys *= (float) 0.577350269189626;
                 xs += s2 - ys;
                 zs += s2 - ys;
-                ys += xz * (/*FNLfloat*/ float) 0.577350269189626;
+                ys += xz * (float) 0.577350269189626;
             }
             break;
             case DefaultOpenSimplex2: {
-                final /*FNLfloat*/ float R3 = (/*FNLfloat*/ float) (2.0 / 3.0);
-                /*FNLfloat*/
-                float r = (xs + ys + zs) * R3; // Rotation, not skew
+                final float R3 = (float) (2.0 / 3.0);
+                float r = (xs + ys + zs) * R3;
                 xs = r - xs;
                 ys = r - ys;
                 zs = r - zs;
@@ -1900,10 +1623,8 @@ public class FastNoiseLite {
         }
     }
 
-    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vector2 coord) {
-        /*FNLfloat*/
+    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, float x, float y, Vector2 coord) {
         float xf = x * frequency;
-        /*FNLfloat*/
         float yf = y * frequency;
 
         int x0 = FastFloor(xf);
@@ -1933,15 +1654,9 @@ public class FastNoiseLite {
         coord.y += Lerp(ly0x, ly1x, ys) * warpAmp;
     }
 
-
-    // Domain Warp Single Wrapper
-
-    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vector3 coord) {
-        /*FNLfloat*/
+    private void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, float x, float y, float z, Vector3 coord) {
         float xf = x * frequency;
-        /*FNLfloat*/
         float yf = y * frequency;
-        /*FNLfloat*/
         float zf = z * frequency;
 
         int x0 = FastFloor(xf);
@@ -1996,20 +1711,12 @@ public class FastNoiseLite {
         coord.z += Lerp(lz0y, Lerp(lz0x, lz1x, ys), zs) * warpAmp;
     }
 
-    // Domain Warp Simplex/OpenSimplex2
-    private void SingleDomainWarpSimplexGradient(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, Vector2 coord, boolean outGradOnly) {
+    private void SingleDomainWarpSimplexGradient(int seed, float warpAmp, float frequency, float x, float y, Vector2 coord, boolean outGradOnly) {
         final float SQRT3 = 1.7320508075688772935274463415059f;
         final float G2 = (3 - SQRT3) / 6;
 
         x *= frequency;
         y *= frequency;
-
-        /*
-         * --- Skew moved to switch statements before fractal evaluation  ---
-         * final FNLfloat F2 = 0.5f * (SQRT3 - 1);
-         * FNLfloat s = (x + y) * F2;
-         * x += s; y += s;
-         */
 
         int i = FastFloor(x);
         int j = FastFloor(y);
@@ -2134,20 +1841,10 @@ public class FastNoiseLite {
         coord.y += vy * warpAmp;
     }
 
-
-    // Domain Warp Fractal Progressive
-
-    private void SingleDomainWarpOpenSimplex2Gradient(int seed, float warpAmp, float frequency, /*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z, Vector3 coord, boolean outGradOnly) {
+    private void SingleDomainWarpOpenSimplex2Gradient(int seed, float warpAmp, float frequency, float x, float y, float z, Vector3 coord, boolean outGradOnly) {
         x *= frequency;
         y *= frequency;
         z *= frequency;
-
-        /*
-         * --- Rotation moved to switch statements before fractal evaluation ---
-         * final FNLfloat R3 = (FNLfloat)(2.0 / 3.0);
-         * FNLfloat r = (x + y + z) * R3; // Rotation, not skew
-         * x = r - x; y = r - y; z = r - z;
-         */
 
         int i = FastRound(x);
         int j = FastRound(y);
@@ -2289,7 +1986,6 @@ public class FastNoiseLite {
         Value
     }
 
-
     public enum RotationType3D {
         None,
         ImproveXYPlanes,
@@ -2304,9 +2000,6 @@ public class FastNoiseLite {
         DomainWarpProgressive,
         DomainWarpIndependent
     }
-
-
-    // Domain Warp Basic Grid
 
     public enum CellularDistanceFunction {
         Euclidean,
@@ -2325,7 +2018,6 @@ public class FastNoiseLite {
         Distance2Div
     }
 
-
     public enum DomainWarpType {
         OpenSimplex2,
         OpenSimplex2Reduced,
@@ -2340,21 +2032,21 @@ public class FastNoiseLite {
     }
 
     public static class Vector2 {
-        public /*FNLfloat*/ float x;
-        public /*FNLfloat*/ float y;
+        public float x;
+        public float y;
 
-        public Vector2(/*FNLfloat*/ float x, /*FNLfloat*/ float y) {
+        public Vector2(float x, float y) {
             this.x = x;
             this.y = y;
         }
     }
 
     public static class Vector3 {
-        public /*FNLfloat*/ float x;
-        public /*FNLfloat*/ float y;
-        public /*FNLfloat*/ float z;
+        public float x;
+        public float y;
+        public float z;
 
-        public Vector3(/*FNLfloat*/ float x, /*FNLfloat*/ float y, /*FNLfloat*/ float z) {
+        public Vector3(float x, float y, float z) {
             this.x = x;
             this.y = y;
             this.z = z;

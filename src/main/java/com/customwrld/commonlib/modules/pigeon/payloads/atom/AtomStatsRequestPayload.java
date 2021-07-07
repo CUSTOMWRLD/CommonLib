@@ -1,0 +1,58 @@
+package com.customwrld.commonlib.modules.pigeon.payloads.atom;
+
+import com.customwrld.pigeon.annotations.Payload;
+import com.customwrld.pigeon.annotations.RequestConstructor;
+import com.customwrld.pigeon.annotations.ResponseConstructor;
+import com.customwrld.pigeon.annotations.Transmit;
+import com.customwrld.pigeon.feedback.FeedbackState;
+import com.customwrld.pigeon.feedback.RequiredState;
+import com.customwrld.pigeon.payloads.bases.FeedbackPayload;
+import com.sun.management.OperatingSystemMXBean;
+import lombok.Getter;
+
+import java.lang.management.ManagementFactory;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+
+@Getter @Payload
+public class AtomStatsRequestPayload extends FeedbackPayload {
+
+    public AtomStatsRequestPayload() {
+        this.payloadId = "atomStatsRequestPayload";
+        this.payloadTimeout = 10000;
+    }
+
+    @RequestConstructor
+    public AtomStatsRequestPayload(Consumer<AtomStatsRequestPayload> feedback) {
+        this();
+        this.payloadState = FeedbackState.REQUEST;
+        this.feedbackID = UUID.randomUUID();
+
+        this.feedback = feedback;
+    }
+
+    @Transmit(direction = RequiredState.RESPONSE) Long latency;
+    @Transmit(direction = RequiredState.RESPONSE) Long uptime;
+    @Transmit(direction = RequiredState.RESPONSE) Long usedMemory;
+    @Transmit(direction = RequiredState.RESPONSE) Double usedCpu;
+    @Transmit(direction = RequiredState.RESPONSE) List<String> servers;
+
+    @ResponseConstructor
+    public AtomStatsRequestPayload(Long latency) {
+        this();
+        this.payloadState = FeedbackState.RESPONSE;
+
+        this.latency = latency;
+        this.uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+        this.usedMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory();
+        this.usedCpu = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getProcessCpuLoad();
+        this.servers = Arrays.asList("TODO: Fix this");
+    }
+
+    @Override
+    public void receive() {}
+
+}

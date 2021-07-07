@@ -3,6 +3,12 @@ package com.customwrld.commonlib.modules.pigeon;
 import com.customwrld.commonlib.CommonLib;
 import com.customwrld.commonlib.modules.grant.Grant;
 import com.customwrld.commonlib.modules.pigeon.payloads.*;
+import com.customwrld.commonlib.modules.pigeon.payloads.grant.GrantAddPayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.grant.GrantExpirePayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.grant.GrantRemovePayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentAddPayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentExpirePayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentRemovePayload;
 import com.customwrld.commonlib.modules.profile.Profile;
 import com.customwrld.commonlib.modules.profile.ProfileAPI;
 import com.customwrld.commonlib.modules.punishment.Punishment;
@@ -23,7 +29,7 @@ public class Listeners implements Listener {
             if(profile != null) {
                 profile.load();
 
-                CommonLib.getCommonLib().getGrantProviders().forEach(provider -> provider.grantAdd(grant));
+                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantAdd(grant));
             }
         }
     }
@@ -38,7 +44,7 @@ public class Listeners implements Listener {
             if(profile != null) {
                 profile.load();
 
-                CommonLib.getCommonLib().getGrantProviders().forEach(provider -> provider.grantRemove(grant));
+                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantRemove(grant));
             }
         }
     }
@@ -53,7 +59,7 @@ public class Listeners implements Listener {
             if(profile != null) {
                 profile.load();
 
-                CommonLib.getCommonLib().getGrantProviders().forEach(provider -> provider.grantExpire(grant));
+                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantExpire(grant));
             }
         }
     }
@@ -68,7 +74,7 @@ public class Listeners implements Listener {
             if(profile != null) {
                 profile.load();
 
-                CommonLib.getCommonLib().getPunishmentProviders().forEach(provider -> provider.punishmentAdd(punishment));
+                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentAdd(punishment));
             }
         }
     }
@@ -83,7 +89,7 @@ public class Listeners implements Listener {
             if(profile != null) {
                 profile.load();
 
-                CommonLib.getCommonLib().getPunishmentProviders().forEach(provider -> provider.punishmentRemove(punishment));
+                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentRemove(punishment));
             }
         }
     }
@@ -98,7 +104,7 @@ public class Listeners implements Listener {
             if(profile != null) {
                 profile.load();
 
-                CommonLib.getCommonLib().getPunishmentProviders().forEach(provider -> provider.punishmentExpire(punishment));
+                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentExpire(punishment));
             }
         }
     }

@@ -4,7 +4,12 @@ import com.customwrld.commonlib.CommonLib;
 import com.customwrld.commonlib.modules.grant.Grant;
 import com.customwrld.commonlib.modules.grant.GrantAPI;
 import com.customwrld.commonlib.modules.network.Gamemode;
-import com.customwrld.commonlib.modules.pigeon.payloads.*;
+import com.customwrld.commonlib.modules.pigeon.payloads.grant.GrantAddPayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.grant.GrantExpirePayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.grant.GrantRemovePayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentAddPayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentExpirePayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentRemovePayload;
 import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.commonlib.modules.rank.Rank;
 import com.customwrld.commonlib.modules.rank.RankAPI;
@@ -130,7 +135,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new PunishmentAddPayload(punishment.getId()));
 
-        CommonLib.getCommonLib().getPunishmentProviders().forEach(provider -> provider.punishmentAdd(punishment));
+        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentAdd(punishment));
     }
 
     /**
@@ -143,7 +148,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new PunishmentRemovePayload(punishment.getId()));
 
-        CommonLib.getCommonLib().getPunishmentProviders().forEach(provider -> provider.punishmentRemove(punishment));
+        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentRemove(punishment));
     }
 
     /**
@@ -156,7 +161,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new PunishmentExpirePayload(punishment.getId()));
 
-        CommonLib.getCommonLib().getPunishmentProviders().forEach(provider -> provider.punishmentExpire(punishment));
+        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentExpire(punishment));
     }
 
     /**
@@ -184,33 +189,22 @@ public class ProfileAPI {
     public Grant getActiveGrant() {
         this.validateGrants();
 
-        List<Grant> cachedGrants = this.profile.getCachedGrants();
         List<Grant> activeGrants = new ArrayList<>();
 
-        for(Grant grant : cachedGrants) {
+        for(Grant grant : this.profile.getCachedGrants()) {
             if (!grant.isRemoved() && !grant.api().hasExpired()) {
                 activeGrants.add(grant);
             }
         }
 
-        activeGrants.sort(GrantAPI.COMPARATOR);
-
-        if(activeGrants.isEmpty()) {
-            Grant grant = new Grant(
-                    this.profile.getId(),
-                    RankAPI.getDefaultRank().getUuid(),
-                    null,
-                    System.currentTimeMillis(),
-                    "Default",
-                    Integer.MAX_VALUE
-            );
-
-            this.addGrant(grant);
-
-            return grant;
-        } else {
-            return activeGrants.get(0);
-        }
+        return activeGrants.stream().min(GrantAPI.COMPARATOR).orElse(new Grant(
+                this.profile.getId(),
+                RankAPI.getDefaultRank().getUuid(),
+                null,
+                System.currentTimeMillis(),
+                "Default",
+                Integer.MAX_VALUE
+        ));
     }
 
     /**
@@ -225,7 +219,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new GrantAddPayload(grant.getId()));
 
-        CommonLib.getCommonLib().getGrantProviders().forEach(provider -> provider.grantAdd(grant));
+        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantAdd(grant));
     }
 
     /**
@@ -237,7 +231,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new GrantRemovePayload(grant.getId()));
 
-        CommonLib.getCommonLib().getGrantProviders().forEach(provider -> provider.grantRemove(grant));
+        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantRemove(grant));
     }
 
     /**
@@ -249,7 +243,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new GrantExpirePayload(grant.getId()));
 
-        CommonLib.getCommonLib().getGrantProviders().forEach(provider -> provider.grantExpire(grant));
+        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantExpire(grant));
     }
 
     public boolean addGamemodeStorage(GamemodeStorage storage) {

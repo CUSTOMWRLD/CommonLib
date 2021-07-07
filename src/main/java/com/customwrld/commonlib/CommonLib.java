@@ -1,14 +1,14 @@
 package com.customwrld.commonlib;
 
-import com.customwrld.commonlib.modules.api.GrantProvider;
-import com.customwrld.commonlib.modules.api.PunishmentProvider;
+import com.customwrld.commonlib.modules.api.APIProvider;
 import com.customwrld.commonlib.modules.pigeon.Listeners;
 import com.customwrld.commonlib.modules.rank.RankAPI;
+import com.customwrld.commonlib.util.PigeonUtil;
+import com.customwrld.commonlib.util.timer.TimerManager;
 import com.customwrld.pigeon.Pigeon;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,14 +21,11 @@ public class CommonLib {
     private final MongoClient mongoClient;
     private final MongoDatabase mongoDatabase;
     private final Pigeon pigeon;
-    private final Set<GrantProvider> grantProviders;
-    private final Set<PunishmentProvider> punishmentProviders;
+    private final TimerManager timerManager;
+    private final Set<APIProvider> apiProviders;
 
     public CommonLib(MongoClient mongoClient, MongoDatabase mongoDatabase, Pigeon pigeon) {
         commonLib = this;
-
-        this.grantProviders = new HashSet<>();
-        this.punishmentProviders = new HashSet<>();
 
         this.mongoClient = mongoClient;
         this.mongoDatabase = mongoDatabase;
@@ -43,7 +40,13 @@ public class CommonLib {
         this.pigeon.getListenersRegistry()
                 .registerListener(new Listeners());
 
+        PigeonUtil.setPigeon(this.pigeon);
+
         RankAPI.initialize();
+
+        this.timerManager = new TimerManager();
+
+        this.apiProviders = new HashSet<>();
     }
 
 }

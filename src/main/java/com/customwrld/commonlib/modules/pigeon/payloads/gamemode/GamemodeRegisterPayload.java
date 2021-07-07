@@ -1,4 +1,4 @@
-package com.customwrld.commonlib.modules.pigeon.payloads;
+package com.customwrld.commonlib.modules.pigeon.payloads.gamemode;
 
 import com.customwrld.commonlib.modules.network.Gamemode;
 import com.customwrld.pigeon.annotations.Payload;
@@ -10,7 +10,7 @@ import lombok.Getter;
 public class GamemodeRegisterPayload extends BasePayload {
 
     public GamemodeRegisterPayload() {
-        this.payloadId = "atom-registerGamemodePayload";
+        this.payloadId = "gamemodeRegisterPayload";
     }
 
     @Transmit

@@ -2,23 +2,6 @@ package com.customwrld.commonlib.util;
 
 import java.util.*;
 
-/**
- * {@author francoiscassistat}
- *
- * Lockable list, made to debug ConcurrentModificationException on Lists. <br>
- * The lock can be switched on/off with setLocked(boolean). <br>
- * When locked, all write access to the list or iterators gets ConcurrentModificationException. <br>
- * Simple usage case: <br>
- *
- * <pre>{@code
- * list.setLocked(true);
- * for (Object o : list.iterator()) { //Won't cause the aforementioned exception,
- *                                    //Only operations on it will.
- *      //...
- * }
- * list.setLocked(false);
- * }</pre>
- */
 public class DebugList<E> implements List<E> {
     protected class LockableListIterator implements Iterator<E> {
         protected Iterator<E> iterator;
@@ -341,4 +324,5 @@ public class DebugList<E> implements List<E> {
     public List<E> subList(int fromIndex, int toIndex) {
         return new LockableListSubList(list.subList(fromIndex, toIndex));
     }
+
 }

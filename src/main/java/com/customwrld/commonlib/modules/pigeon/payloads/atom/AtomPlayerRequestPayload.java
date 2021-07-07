@@ -1,6 +1,5 @@
-package com.customwrld.commonlib.modules.pigeon.payloads;
+package com.customwrld.atom.pigeon.payloads;
 
-import com.customwrld.commonlib.modules.network.Gamemode;
 import com.customwrld.pigeon.annotations.Payload;
 import com.customwrld.pigeon.annotations.RequestConstructor;
 import com.customwrld.pigeon.annotations.ResponseConstructor;
@@ -14,38 +13,32 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 @Getter @Payload
-public class GamemodeRequestPayload extends FeedbackPayload {
+public class AtomPlayerRequestPayload extends FeedbackPayload {
 
-    public GamemodeRequestPayload() {
-        this.payloadId = "atom-gamemodeRequestPayload";
+    public AtomPlayerRequestPayload() {
+        this.payloadId = "atomPlayerRequestPayload";
         this.payloadTimeout = 10000;
     }
 
-    //Request
-
-    @Transmit(direction = RequiredState.REQUEST) String name;
+    @Transmit UUID player;
 
     @RequestConstructor
-    public GamemodeRequestPayload(String name, Consumer<GamemodeRequestPayload> feedback) {
+    public AtomPlayerRequestPayload(UUID player, Consumer<AtomPlayerRequestPayload> feedback) {
         this();
         this.payloadState = FeedbackState.REQUEST;
         this.feedbackID = UUID.randomUUID();
 
-        this.name = name;
-
         this.feedback = feedback;
     }
 
-    //Response
-
-    @Transmit(direction = RequiredState.RESPONSE) Gamemode gamemode;
+    @Transmit(direction = RequiredState.RESPONSE) boolean isOnline;
 
     @ResponseConstructor
-    public GamemodeRequestPayload(Gamemode gamemode) {
+    public AtomPlayerRequestPayload(boolean isOnline) {
         this();
         this.payloadState = FeedbackState.RESPONSE;
 
-        this.gamemode = gamemode;
+        this.isOnline = isOnline;
     }
 
     @Override

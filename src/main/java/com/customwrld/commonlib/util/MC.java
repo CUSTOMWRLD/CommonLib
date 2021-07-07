@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -54,20 +53,20 @@ public class MC {
 
         private static final GsonComponentSerializer gsonSerializer = GsonComponentSerializer.gson();
 
-        public static TextComponent CONSOLE = Component.text("Console").color(NamedTextColor.DARK_RED);
+        public static TextComponent CONSOLE = Component.text("Console").color(MC.CC.DARK_RED.getTextColor());
 
         public static TextComponent SEPARATOR = Component.text(StringUtils.repeat(" ", 80))
-                .color(NamedTextColor.DARK_GRAY)
+                .color(MC.CC.DARK_GRAY.getTextColor())
                 .decoration(TextDecoration.STRIKETHROUGH, true)
                 .decoration(TextDecoration.ITALIC, false);
 
         public static TextComponent SCOREBOARD_SEPARATOR = Component.text(StringUtils.repeat(" ", 32))
-                .color(NamedTextColor.DARK_GRAY)
+                .color(MC.CC.DARK_GRAY.getTextColor())
                 .decoration(TextDecoration.STRIKETHROUGH, true)
                 .decoration(TextDecoration.ITALIC, false);
 
         public static TextComponent MENU_SEPARATOR = Component.text(StringUtils.repeat(" ", 50))
-                .color(NamedTextColor.DARK_GRAY)
+                .color(MC.CC.DARK_GRAY.getTextColor())
                 .decoration(TextDecoration.STRIKETHROUGH, true)
                 .decoration(TextDecoration.ITALIC, false);
 
@@ -204,7 +203,7 @@ public class MC {
                     )
                     .append(
                             Component.text(" » ")
-                                    .color(NamedTextColor.DARK_GRAY)
+                                    .color(MC.CC.DARK_GRAY.getTextColor())
                                     .decoration(TextDecoration.BOLD, true)
                     )
                     .append(component)
@@ -219,13 +218,13 @@ public class MC {
             int emptyHearts = allHearts - fullHearts - (halfHeart ? 1 : 0);
 
             return Component.text()
-                    .append(Component.text(StringUtils.repeat(heart, fullHearts)).color(NamedTextColor.DARK_RED))
+                    .append(Component.text(StringUtils.repeat(heart, fullHearts)).color(MC.CC.DARK_RED.getTextColor()))
                     .append(halfHeart ? Component.text(heart)
-                            .color(NamedTextColor.RED) : Component.empty())
+                            .color(MC.CC.RED.getTextColor()) : Component.empty())
                     .append(Component.text(StringUtils.repeat(heart, emptyHearts))
-                            .color(NamedTextColor.DARK_GRAY))
+                            .color(MC.CC.DARK_GRAY.getTextColor()))
                     .append(displayAmount ? Component.text(" (" + (int) health + "/" + (int) maxHealth + ")")
-                            .color(NamedTextColor.WHITE) : Component.empty())
+                            .color(MC.CC.WHITE.getTextColor()) : Component.empty())
                     .build();
         }
 

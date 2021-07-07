@@ -1,11 +1,15 @@
 package com.customwrld.commonlib.modules.network;
 
 import com.customwrld.commonlib.CommonLib;
-import com.customwrld.commonlib.modules.pigeon.payloads.GamemodeRegisterPayload;
-import com.customwrld.commonlib.modules.pigeon.payloads.GamemodeRequestPayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.gamemode.GamemodeRegisterPayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.gamemode.GamemodeRequestPayload;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Filters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,48 +19,70 @@ import java.util.function.Consumer;
 @AllArgsConstructor
 public class Gamemode {
 
-    @Getter private static final List<Gamemode> cachedGamemodes = Collections.synchronizedList(new ArrayList<>());
+    public static MongoCollection<Document> collection = CommonLib.getCommonLib().getMongoDatabase().getCollection("gamemodes");
+//    @Getter private static final List<Gamemode> cachedGamemodes = Collections.synchronizedList(new ArrayList<>());
 
     @Getter private final String name;
 
     @Getter @Setter private int totalPlayers;
     @Getter @Setter private RecordValue totalPlayersRecord;
 
+    public Gamemode(Document document) {
+        this.name = document.getString("_id");
+        this.totalPlayersRecord = new RecordValue((Document) document.get("totalPlayersRecord"));
+    }
+
     public Gamemode(String name) {
         this.name = name;
-        totalPlayersRecord = new RecordValue(new Date(), "0");
+        this.totalPlayersRecord = new RecordValue(new Date(), "0");
     }
 
-    public static void getByName(String name, @NotNull Consumer<Gamemode> callback) {
-        var cachedGamemode = cachedGamemodes.stream()
-                .filter(gamemode -> gamemode.getName().equals(name))
-                .findFirst().orElse(null);
+    public static Gamemode getByName(String name) {
+        var document = collection.find(Filters.eq(name)).first();
 
-        if(cachedGamemode != null) {
-            callback.accept(cachedGamemode);
-            return;
+        if(document != null) {
+            return new Gamemode(document);
         }
 
-        var pigeon = CommonLib.getCommonLib().getPigeon();
-        pigeon.broadcast(new GamemodeRequestPayload(name, payload -> {
-            var gamemode = payload.getGamemode();
-            cachedGamemodes.add(gamemode);
-
-            callback.accept(gamemode);
-        }));
+        return null;
     }
 
-    public static void register(@NotNull Gamemode gamemode, @Nullable Consumer<Boolean> callback) {
-        getByName(gamemode.getName(), otherGamemode -> {
-            if(otherGamemode == null) {
-                cachedGamemodes.add(gamemode);
+    public static void register(@NotNull Gamemode gamemode) {
+//        getByName(gamemode.getName(), otherGamemode -> {
+//            if(otherGamemode == null) {
+////                cachedGamemodes.add(gamemode);
+//
+////                if(callback != null) { callback.accept(true); }
+//
+//                var pigeon = CommonLib.getCommonLib().getPigeon();
+//                pigeon.broadcast(new GamemodeRegisterPayload(gamemode));
+//            }
+//        });
 
-                if(callback != null) { callback.accept(true); }
+        collection.insertOne(new Document("_id", gamemode.getName())
+                .append("totalPlayersRecord", gamemode.getTotalPlayersRecord().toDocument()));
+    }
 
-                var pigeon = CommonLib.getCommonLib().getPigeon();
-                pigeon.broadcast(new GamemodeRegisterPayload(gamemode));
+    public static void loadAll() {
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+            while (cursor.hasNext()) {
+                var document = cursor.next();
+                load(new Gamemode(document));
             }
-        });
+        }
+    }
+
+    public static boolean load(Gamemode gamemode) {
+        if(getByName(gamemode.getName()) != null) { return false; }
+//        gamemodes.add(gamemode);
+        return true;
+    }
+
+    public static boolean save(Gamemode gamemode) {
+        if(!load(gamemode)) { return false; }
+        collection.insertOne(new Document("_id", gamemode.getName())
+                .append("totalPlayersRecord", gamemode.getTotalPlayersRecord().toDocument()));
+        return true;
     }
 
     @Override

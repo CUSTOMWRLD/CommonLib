@@ -1,4 +1,4 @@
-package com.customwrld.commonlib.modules.pigeon.payloads;
+package com.customwrld.commonlib.modules.pigeon.payloads.grant;
 
 import com.customwrld.pigeon.annotations.Payload;
 import com.customwrld.pigeon.annotations.Transmit;
@@ -6,15 +6,15 @@ import com.customwrld.pigeon.payloads.bases.BasePayload;
 import lombok.Getter;
 
 @Getter @Payload
-public class GrantRemovePayload extends BasePayload {
+public class GrantAddPayload extends BasePayload {
 
     @Transmit String grant;
 
-    public GrantRemovePayload() {
-        payloadId = "common-grantRemove";
+    public GrantAddPayload() {
+        payloadId = "grantAddPayload";
     }
 
-    public GrantRemovePayload(String grant) {
+    public GrantAddPayload(String grant) {
         this();
         this.grant = grant;
     }
