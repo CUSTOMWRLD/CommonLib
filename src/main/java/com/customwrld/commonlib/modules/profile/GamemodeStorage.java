@@ -1,6 +1,9 @@
 package com.customwrld.commonlib.modules.profile;
 
+import com.customwrld.commonlib.modules.grant.Grant;
 import com.customwrld.commonlib.modules.network.Gamemode;
+import com.customwrld.commonlib.modules.punishment.Punishment;
+import com.mongodb.client.model.Filters;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,13 +11,12 @@ import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GamemodeStorage {
-    @Getter private final Gamemode gamemode;
-    @Getter private final Map<String, StorageValue> values = Collections.synchronizedMap(new HashMap<>());
+    @Getter private Gamemode gamemode;
+    @Getter private Map<String, StorageValue> values = Collections.synchronizedMap(new HashMap<>());
 
     public GamemodeStorage(@NotNull Gamemode gamemode) {
         this.gamemode = gamemode;
