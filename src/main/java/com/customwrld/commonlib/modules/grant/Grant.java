@@ -1,6 +1,8 @@
 package com.customwrld.commonlib.modules.grant;
 
 import com.customwrld.commonlib.CommonLib;
+import com.customwrld.commonlib.modules.profile.Profile;
+import com.customwrld.commonlib.modules.rank.RankAPI;
 import com.customwrld.commonlib.util.Util;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -10,6 +12,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -43,35 +47,21 @@ public class Grant {
         this.api = new GrantAPI(this);
     }
 
-    private Grant(String id) {
-        this.id = id;
+    private Grant(Document document) {
+        this.id = document.getString("_id");
         this.api = new GrantAPI(this);
+        this.load(document);
+    }
+
+    public static Grant fromDocument(@NotNull Document document) {
+        return new Grant(document);
     }
 
     public static Grant getGrant(String id) {
-        Document document = collection.find(Filters.eq("_id", id)).first();
+        var document = collection.find(Filters.eq("_id", id)).first();
 
-        if (document != null) {
-            Grant grant = new Grant(document.getString("_id"));
-
-            grant.setPlayerUUID(UUID.fromString(document.getString("playerUUID")));
-            grant.setRankUUID(UUID.fromString(document.getString("rankUUID")));
-
-            grant.setAddedByUUID(document.getString("addedByUUID") != null ? UUID.fromString(document.getString("addedByUUID")) : null);
-            grant.setAddedAt(document.getLong("addedAt"));
-            grant.setAddedReason(document.getString("addedReason"));
-            grant.setDuration(document.getLong("duration"));
-
-            grant.setRemoved(document.getBoolean("removed"));
-
-            if (grant.isRemoved()) {
-                grant.setRemovedAt(document.getLong("removedAt"));
-                grant.setRemovedByUUID(document.getString("removedByUUID") != null ? UUID.fromString(document.getString("removedByUUID")) : null);
-                grant.setRemovedReason(document.getString("removedReason"));
-            }
-
-            return grant;
-        }
+        if (document != null)
+            return new Grant(document);
 
         return null;
     }
@@ -80,8 +70,37 @@ public class Grant {
         collection.deleteOne(Filters.eq("_id", this.id));
     }
 
+    private void load(@Nullable Document document) {
+        document = (document != null) ? document : collection.find(Filters.eq(this.getId())).first();
+
+        if (document != null) {
+            this.id = document.getString("_id");
+
+            this.playerUUID = UUID.fromString(document.getString("playerUUID"));
+            this.rankUUID = UUID.fromString(document.getString("rankUUID"));
+
+            this.addedByUUID = document.getString("addedByUUID") != null ? UUID.fromString(document.getString("addedByUUID")) : null;
+            this.addedAt = document.getLong("addedAt");
+            this.addedReason = document.getString("addedReason");
+            this.duration = document.getLong("duration");
+
+            this.removed = document.getBoolean("removed");
+
+            if (this.removed) {
+                this.removedAt = document.getLong("removedAt");
+                this.removedByUUID = document.getString("removedByUUID") != null ? UUID.fromString(document.getString("removedByUUID")) : null;
+                this.removedReason = document.getString("removedReason");
+            }
+        }
+    }
+
     public void save() {
-        Document document = new Document();
+        collection.replaceOne(Filters.eq("_id", this.id), toDocument(), new ReplaceOptions().upsert(true));
+    }
+
+    public Document toDocument() {
+        var document = new Document();
+
         document.put("_id", this.id);
         document.put("playerUUID", this.playerUUID.toString());
         document.put("rankUUID", this.rankUUID.toString());
@@ -96,7 +115,7 @@ public class Grant {
         document.put("removedByUUID", this.removedByUUID != null ? this.removedByUUID.toString() : null);
         document.put("removedReason", this.removedReason != null ? this.removedReason : null);
 
-        collection.replaceOne(Filters.eq("_id", this.id), document, new ReplaceOptions().upsert(true));
+        return document;
     }
 
     @Override

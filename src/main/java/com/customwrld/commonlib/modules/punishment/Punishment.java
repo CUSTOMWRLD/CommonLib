@@ -1,6 +1,7 @@
 package com.customwrld.commonlib.modules.punishment;
 
 import com.customwrld.commonlib.CommonLib;
+import com.customwrld.commonlib.modules.grant.Grant;
 import com.customwrld.commonlib.util.Util;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -12,7 +13,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.print.Doc;
 import java.awt.*;
 import java.util.UUID;
 
@@ -21,7 +25,7 @@ public class Punishment {
 
     @Getter private static final MongoCollection<Document> collection = CommonLib.getCommonLib().getMongoDatabase().getCollection("punishments");
 
-    @Setter(AccessLevel.NONE) private final String id;
+    private String id;
     private UUID playerUUID;
     private Type type;
     private UUID addedByUUID;
@@ -34,6 +38,10 @@ public class Punishment {
     private boolean removed;
     @Accessors(fluent = true)
     private final PunishmentAPI api;
+
+    public Punishment() {
+        this.api = new PunishmentAPI(this);
+    }
 
     public Punishment(UUID playerUUID, Type type, UUID addedByUUID, long addedAt, String addedReason, long duration) {
         this.id = Util.generateId();
@@ -51,30 +59,21 @@ public class Punishment {
         this.api = new PunishmentAPI(this);
     }
 
+    private Punishment(Document document) {
+        this.id = document.getString("_id");
+        this.api = new PunishmentAPI(this);
+        this.load(document);
+    }
+
+    public static Punishment fromDocument(@NotNull Document document) {
+        return new Punishment(document);
+    }
+
     public static Punishment getPunishment(String id) {
-        Document document = collection.find(Filters.eq("_id", id)).first();
+        var document = collection.find(Filters.eq("_id", id)).first();
 
-        if (document != null) {
-            Punishment punishment = new Punishment(document.getString("_id"));
-
-            punishment.setPlayerUUID(UUID.fromString(document.getString("playerUUID")));
-            punishment.setType(Type.valueOf(document.getString("type")));
-
-            punishment.setAddedByUUID(document.getString("addedByUUID") != null ? UUID.fromString(document.getString("addedByUUID")) : null);
-            punishment.setAddedAt(document.getLong("addedAt"));
-            punishment.setAddedReason(document.getString("addedReason"));
-            punishment.setDuration(document.getLong("duration"));
-
-            punishment.setRemoved(document.getBoolean("removed"));
-
-            if (punishment.isRemoved()) {
-                punishment.setRemovedAt(document.getLong("removedAt"));
-                punishment.setRemovedByUUID(document.getString("removedByUUID") != null ? UUID.fromString(document.getString("removedByUUID")) : null);
-                punishment.setRemovedReason(document.getString("removedReason"));
-            }
-
-            return punishment;
-        }
+        if (document != null)
+            return new Punishment(document);
 
         return null;
     }
@@ -83,8 +82,35 @@ public class Punishment {
         collection.deleteOne(Filters.eq("_id", this.id));
     }
 
+    private void load(@Nullable Document document) {
+        document = (document != null) ? document : collection.find(Filters.eq(this.getId())).first();
+
+        if(document != null) {
+            this.playerUUID = UUID.fromString(document.getString("playerUUID"));
+            this.type = Type.valueOf(document.getString("type"));
+
+            this.addedByUUID = document.getString("addedByUUID") != null ? UUID.fromString(document.getString("addedByUUID")) : null;
+            this.addedAt = document.getLong("addedAt");
+            this.addedReason = document.getString("addedReason");
+            this.duration = document.getLong("duration");
+
+            this.removed = document.getBoolean("removed");
+
+            if(this.removed) {
+                this.removedAt = document.getLong("removedAt");
+                this.removedByUUID = document.getString("removedByUUID") != null ? UUID.fromString(document.getString("removedByUUID")) : null;
+                this.removedReason = document.getString("removedReason");
+            }
+        }
+    }
+
     public void save() {
-        Document document = new Document();
+        collection.replaceOne(Filters.eq("_id", this.id), toDocument(), new ReplaceOptions().upsert(true));
+    }
+
+    public Document toDocument() {
+        var document = new Document();
+
         document.put("_id", this.id);
         document.put("playerUUID", this.playerUUID.toString());
         document.put("type", this.type.name());
@@ -99,7 +125,7 @@ public class Punishment {
         document.put("removedByUUID", this.removedByUUID != null ? this.removedByUUID.toString() : null);
         document.put("removedReason", this.removedReason != null ? this.removedReason : null);
 
-        collection.replaceOne(Filters.eq("_id", this.id), document, new ReplaceOptions().upsert(true));
+        return document;
     }
 
     @Override
