@@ -168,15 +168,13 @@ public class ProfileAPI {
      * Validates the Profile's Grants.
      */
     public void validateGrants() {
-        Iterator<Grant> iterator = this.profile.getCachedGrants().iterator();
-
-        while (iterator.hasNext()) {
-            Grant grant = iterator.next();
+        for (final var it = this.profile.getCachedGrants().iterator(); it.hasNext();) {
+            Grant grant = it.next();
 
             if (Rank.getRank(grant.getRankUUID(), true) == null) {
                 this.profile.getGrants().remove(grant.getId());
                 grant.delete();
-                iterator.remove();
+                it.remove();
             } else if (!grant.isRemoved() && grant.api().hasExpired()) {
                 this.expireGrant(grant, System.currentTimeMillis());
             }
@@ -197,20 +195,15 @@ public class ProfileAPI {
             }
         }
 
-        return activeGrants.stream().min(GrantAPI.COMPARATOR).orElse(new Grant(
-                this.profile.getId(),
-                RankAPI.getDefaultRank().getUuid(),
-                null,
-                System.currentTimeMillis(),
-                "Default",
-                Integer.MAX_VALUE
-        ));
+        return activeGrants.stream().min(GrantAPI.COMPARATOR).orElse(Grant.DEFAULT_GRANT);
     }
 
     /**
      * Adds a new Grant to the Profile.
      */
     public void addGrant(Grant grant) {
+        if(grant == Grant.DEFAULT_GRANT) { return; }
+
         this.profile.getGrants().add(grant.getId());
         this.profile.getCachedGrants().add(grant);
 
@@ -226,6 +219,8 @@ public class ProfileAPI {
      * Removes a Grant from the Profile.
      */
     public void removeGrant(Grant grant, UUID removedBy, Long removedAt, String removedReason) {
+        if(grant == Grant.DEFAULT_GRANT) { return; }
+
         grant.api().remove(removedBy, removedAt, removedReason);
         this.profile.save();
 
@@ -238,6 +233,8 @@ public class ProfileAPI {
      * Expires a Grant on the Profile.
      */
     public void expireGrant(Grant grant, Long removedAt) {
+        if(grant == Grant.DEFAULT_GRANT) { return; }
+
         grant.api().remove(null, removedAt, "Grant Expired");
         this.profile.save();
 

@@ -22,7 +22,16 @@ public class Grant {
 
     @Getter private static final MongoCollection<Document> collection = CommonLib.getCommonLib().getMongoDatabase().getCollection("grants");
 
-    final String id;
+    public static final Grant DEFAULT_GRANT = new Grant(
+            null,
+            RankAPI.getDefaultRank().getUuid(),
+            null,
+            0,
+            "Default",
+            Integer.MAX_VALUE
+    );
+
+    private String id;
     private UUID playerUUID;
     private UUID rankUUID;
     private UUID addedByUUID;
