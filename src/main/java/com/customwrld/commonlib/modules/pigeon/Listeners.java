@@ -20,9 +20,8 @@ public class Listeners implements Listener {
     public void onGrantAdd(GrantAddPayload payload) {
         Grant grant = Grant.getGrant(payload.getGrant());
 
-        if(grant != null) {
+        if(grant != null)
             CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantAdd(grant));
-        }
     }
 
     @PayloadHandler
