@@ -1,8 +1,6 @@
 package com.customwrld.commonlib.modules.network;
 
 import com.customwrld.commonlib.CommonLib;
-import com.customwrld.commonlib.modules.pigeon.payloads.gamemode.GamemodeRegisterPayload;
-import com.customwrld.commonlib.modules.pigeon.payloads.gamemode.GamemodeRequestPayload;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
@@ -11,10 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Date;
+import java.util.Objects;
 
 @AllArgsConstructor
 public class Gamemode {

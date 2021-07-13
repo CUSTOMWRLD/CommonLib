@@ -3,12 +3,11 @@ package com.customwrld.commonlib.modules.rank;
 import com.customwrld.commonlib.util.MC;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.Document;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RankAPI {

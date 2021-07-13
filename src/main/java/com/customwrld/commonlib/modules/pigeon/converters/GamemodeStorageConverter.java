@@ -1,11 +1,6 @@
 package com.customwrld.commonlib.modules.pigeon.converters;
 
-import com.customwrld.commonlib.modules.grant.Grant;
-import com.customwrld.commonlib.modules.network.Gamemode;
-import com.customwrld.commonlib.modules.pigeon.DocumentHelper;
 import com.customwrld.commonlib.modules.profile.GamemodeStorage;
-import com.customwrld.commonlib.modules.profile.Profile;
-import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.pigeon.Converter;
 import com.customwrld.pigeon.Pigeon;
 import com.google.gson.JsonElement;
@@ -14,10 +9,6 @@ import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.UUID;
-
-import static com.customwrld.commonlib.modules.pigeon.DocumentHelper.DefinedDocument;
-import static com.customwrld.commonlib.modules.pigeon.DocumentHelper.DefinedType;
 
 public class GamemodeStorageConverter extends Converter<GamemodeStorage> {
 

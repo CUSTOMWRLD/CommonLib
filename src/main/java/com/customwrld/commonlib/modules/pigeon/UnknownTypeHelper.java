@@ -5,12 +5,10 @@ import com.customwrld.pigeon.Pigeon;
 import com.customwrld.pigeon.converters.ListConverter;
 import com.customwrld.pigeon.converters.MapConverter;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 

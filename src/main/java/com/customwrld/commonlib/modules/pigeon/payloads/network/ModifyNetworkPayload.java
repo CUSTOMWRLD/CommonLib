@@ -6,8 +6,6 @@ import com.customwrld.pigeon.annotations.Transmit;
 import com.customwrld.pigeon.payloads.bases.BasePayload;
 import lombok.Getter;
 
-import java.util.UUID;
-
 @Getter @Payload
 public class ModifyNetworkPayload extends BasePayload {
 

@@ -5,7 +5,6 @@ import com.customwrld.pigeon.Converter;
 import com.customwrld.pigeon.converters.StringConverter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.kyori.adventure.text.Component;
 
 import java.lang.reflect.Type;
