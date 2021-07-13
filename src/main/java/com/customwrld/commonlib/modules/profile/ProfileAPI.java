@@ -12,7 +12,6 @@ import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentExp
 import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentRemovePayload;
 import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.commonlib.modules.rank.Rank;
-import com.customwrld.commonlib.modules.rank.RankAPI;
 import com.customwrld.commonlib.util.MC;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -28,13 +27,6 @@ public class ProfileAPI {
     public ProfileAPI(Profile profile) {
         this.profile = profile;
         this.commonLib = CommonLib.getCommonLib();
-    }
-
-    /**
-     * Returns a Cached Profile.
-     */
-    public static Profile getCachedProfile(UUID uuid) {
-        return Profile.getProfiles().get(uuid);
     }
 
     /**
@@ -130,9 +122,9 @@ public class ProfileAPI {
         this.profile.getCachedPunishments().add(punishment);
 
         punishment.save();
-        this.profile.save();
+        this.profile.update();
 
-        this.commonLib.getPigeon().broadcast(new PunishmentAddPayload(punishment.getId()));
+        this.commonLib.getPigeon().broadcast(new PunishmentAddPayload(this.profile, punishment.getId()));
 
         CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentAdd(punishment));
     }
@@ -143,9 +135,9 @@ public class ProfileAPI {
     public void removePunishment(Punishment punishment, @Nullable UUID removedByUUID, Long removedAt, String removedReason) {
         punishment.api().remove(removedByUUID, removedAt, removedReason);
 
-        this.profile.save();
+        this.profile.update();
 
-        this.commonLib.getPigeon().broadcast(new PunishmentRemovePayload(punishment.getId()));
+        this.commonLib.getPigeon().broadcast(new PunishmentRemovePayload(this.profile, punishment.getId()));
 
         CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentRemove(punishment));
     }
@@ -156,7 +148,7 @@ public class ProfileAPI {
     public void expirePunishment(Punishment punishment, Long removedAt) {
         punishment.api().remove(null, removedAt, "Punishment Expired");
 
-        this.profile.save();
+        this.profile.update();
 
         this.commonLib.getPigeon().broadcast(new PunishmentExpirePayload(punishment.getId()));
 
@@ -207,9 +199,9 @@ public class ProfileAPI {
         this.profile.getCachedGrants().add(grant);
 
         grant.save();
-        this.profile.save();
+        this.profile.update();
 
-        this.commonLib.getPigeon().broadcast(new GrantAddPayload(grant.getId()));
+        this.commonLib.getPigeon().broadcast(new GrantAddPayload(this.profile, grant.getId()));
 
         CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantAdd(grant));
     }
@@ -221,9 +213,9 @@ public class ProfileAPI {
         if(grant == Grant.DEFAULT_GRANT) { return; }
 
         grant.api().remove(removedBy, removedAt, removedReason);
-        this.profile.save();
+        this.profile.update();
 
-        this.commonLib.getPigeon().broadcast(new GrantRemovePayload(grant.getId()));
+        this.commonLib.getPigeon().broadcast(new GrantRemovePayload(this.profile, grant.getId()));
 
         CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantRemove(grant));
     }
@@ -235,9 +227,9 @@ public class ProfileAPI {
         if(grant == Grant.DEFAULT_GRANT) { return; }
 
         grant.api().remove(null, removedAt, "Grant Expired");
-        this.profile.save();
+        this.profile.update();
 
-        this.commonLib.getPigeon().broadcast(new GrantExpirePayload(grant.getId()));
+        this.commonLib.getPigeon().broadcast(new GrantExpirePayload(this.profile, grant.getId()));
 
         CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantExpire(grant));
     }

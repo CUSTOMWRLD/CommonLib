@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Getter @Setter
 public abstract class AbstractTransactionContext {
@@ -42,23 +43,28 @@ public abstract class AbstractTransactionContext {
         return totals;
     }
 
-    public boolean process(boolean needsEnoughBalance, boolean logTransaction) {
-        Profile profile = Profile.getProfile(playerUUID);
-        Map<Currencies.CurrencyType, Integer> totals = getTotals();
-        if (needsEnoughBalance) {
-            for (Map.Entry<Currencies.CurrencyType, Integer> ent : totals.entrySet()) {
-                if (!ent.getKey().canAfford(profile, this.gamemode, ent.getValue())) {
-                    return false;
+    public CompletableFuture<Boolean> process(boolean needsEnoughBalance, boolean logTransaction) {
+        var future = new CompletableFuture<Boolean>();
+
+        Profile.getProfile(playerUUID).thenAccept(profile -> {
+            Map<Currencies.CurrencyType, Integer> totals = getTotals();
+            if (needsEnoughBalance) {
+                for (Map.Entry<Currencies.CurrencyType, Integer> ent : totals.entrySet()) {
+                    if (!ent.getKey().canAfford(profile, this.gamemode, ent.getValue())) {
+                        future.complete(false);
+                    }
                 }
             }
-        }
 
-        processPayment(profile);
-        if (logTransaction) {
-            generateTransaction().save();
-        }
+            processPayment(profile);
+            if (logTransaction) {
+                generateTransaction().save();
+            }
 
-        return true;
+            future.complete(true);
+        });
+
+        return future;
     }
 
     private void processPayment(Profile profile) {

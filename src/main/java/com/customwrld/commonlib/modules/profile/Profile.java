@@ -3,11 +3,13 @@ package com.customwrld.commonlib.modules.profile;
 import com.customwrld.commonlib.CommonLib;
 import com.customwrld.commonlib.modules.grant.Grant;
 import com.customwrld.commonlib.modules.network.Gamemode;
+import com.customwrld.commonlib.modules.pigeon.payloads.profile.ProfileCreatePayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.profile.ProfileRequestPayload;
+import com.customwrld.commonlib.modules.pigeon.payloads.profile.ProfileUpdatePayload;
 import com.customwrld.commonlib.modules.punishment.Punishment;
-import com.customwrld.commonlib.util.CollectionsUtil;
+import com.customwrld.commonlib.util.PigeonUtil;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.ReplaceOptions;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -16,28 +18,29 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Getter @Setter
 public class Profile {
 
     @Getter private static final MongoCollection<Document> collection = CommonLib.getCommonLib().getMongoDatabase().getCollection("profiles");
-    @Getter private static final Map<UUID, Profile> profiles = new HashMap<>();
+//    @Getter private static final Map<UUID, Profile> profiles = new HashMap<>();
 
-    private final UUID id;
-    private final List<String> permissions;
-    private final List<String> punishments;
-    private final List<Punishment> cachedPunishments;
-    private final List<String> grants;
-    private final List<Grant> cachedGrants;
-    private final List<UUID> ignored;
-    private final List<UUID> friends;
-    private final Options optionsProfile;
-    private final Staff staffProfile;
+    private UUID id;
+    private List<String> permissions;
+    private List<String> punishments;
+    private List<Punishment> cachedPunishments;
+    private List<String> grants;
+    private List<Grant> cachedGrants;
+    private List<UUID> ignored;
+    private List<UUID> friends;
+    private Options optionsProfile;
+    private Staff staffProfile;
     private String name;
     private String searchableName;
     private String currentAddress;
-    private String discordId;
+    private String discord;
     private int gold;
     private Long firstSeen;
     private Long lastSeen;
@@ -46,9 +49,18 @@ public class Profile {
     @Accessors(fluent = true)
     private final ProfileAPI api;
 
-    private Profile(String username, UUID id) {
+    public Profile() {
+        this.api = new ProfileAPI(this);
+    }
+
+    /**
+     * <strong>Usage reserved for Atom.</strong> <br>
+     * Use {@linkplain Profile#createProfile(String, UUID)} instead.
+     */
+    public Profile(String username, UUID id) {
         this.id = id;
         this.name = username;
+        this.searchableName = username.toUpperCase();
         this.permissions = new ArrayList<>();
         this.punishments = new ArrayList<>();
         this.cachedPunishments = new ArrayList<>();
@@ -60,43 +72,75 @@ public class Profile {
         this.staffProfile = new Staff();
         this.gamemodeStorages = new HashMap<>();
         this.api = new ProfileAPI(this);
-        this.load();
+        this.load(null);
     }
 
-    public static Profile getProfile(@NotNull String username) {
-        for(Profile profile : profiles.values()) {
-            if(profile.getName().equalsIgnoreCase(username)) {
-                return profile;
-            }
-        }
-
-        Document document = collection.find(Filters.eq("searchableName", username.toUpperCase())).first();
-
-        if(document != null) {
-            return new Profile(document.getString("name"), UUID.fromString(document.getString("_id")));
-        } else {
-            return null;
-        }
+    private Profile(Document document) {
+        this.id = UUID.fromString(document.getString("_id"));
+        this.api = new ProfileAPI(this);
+        this.load(document);
     }
 
-    public static Profile getProfile(@Nullable String name, @NotNull UUID id) {
-        Profile profile = ProfileAPI.getCachedProfile(id);
-
-        if(profile != null) {
-            return profile;
-        }
-
-        profile = new Profile(name, id);
-
+    public static Profile createProfile(@NotNull String name, @NotNull UUID uuid) {
+        var profile = new Profile(name, uuid);
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileCreatePayload(profile, null), PigeonUtil.GeneralUnits.ATOM.getUnit());
         return profile;
     }
 
-    public static Profile getProfile(@NotNull UUID id) {
-        return getProfile(null, id);
+    public static Profile fromDocument(@NotNull Document document) {
+        return new Profile(document);
     }
 
-    public void load() {
-        Document document = collection.find(Filters.eq("_id", this.getId().toString())).first();
+    public static CompletableFuture<Profile> getProfile(@NotNull String name) {
+        var future = new CompletableFuture<Profile>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileRequestPayload(name, payload -> future.complete(payload.getProfile())), PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
+    public static CompletableFuture<Profile> getProfile(@Nullable String name, @NotNull UUID id) {
+        var future = new CompletableFuture<Profile>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileRequestPayload(name, id, payload -> {
+                    future.complete(payload.getProfile());
+                }), PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
+    public static CompletableFuture<Profile> getProfile(@NotNull UUID id) {
+        var future = new CompletableFuture<Profile>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileRequestPayload(id, payload -> future.complete(payload.getProfile())), PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
+    /**
+     * Updates the {@linkplain Profile} on Atom. <br>
+     * Use this to make sure a {@linkplain Profile} is up-to-date when it changes or leaves a server.
+     */
+    public CompletableFuture<ProfileQueryResult> update() {
+        var future = new CompletableFuture<ProfileQueryResult>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileUpdatePayload(this, payload -> future.complete(payload.getResult())), PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
+    private void load(@Nullable Document document) {
+        document = (document != null) ? document : collection.find(Filters.eq(this.getId().toString())).first();
 
         if (document != null) {
             if (this.name == null) {
@@ -104,58 +148,49 @@ public class Profile {
             }
 
             this.searchableName = this.name.toUpperCase();
-            this.firstSeen = Long.parseLong(document.getString("firstSeen"));
-            this.lastSeen = Long.parseLong(document.getString("lastSeen"));
+            this.firstSeen = document.getLong("firstSeen");
+            this.lastSeen = document.getLong("lastSeen");
             this.currentAddress = document.getString("currentAddress");
 
             this.optionsProfile = new Options(document.get("optionsProfile", Document.class));
             this.staffProfile = new Staff(document.get("staffProfile", Document.class));
 
-            Document staffDocument = (Document) document.get("staff");
-            Staff staff = this.getStaffProfile();
-
-            staff.twoFactorKey = staffDocument.getString("twoFactorKey");
-            staff.operator = staffDocument.getBoolean("operator");
-            staff.receivingStaffMessages = staffDocument.getBoolean("receivingStaffMessages");
-            staff.twoFactor = staffDocument.getBoolean("twoFactor");
-            staff.locked = staffDocument.getBoolean("locked");
-
-            this.discordId = document.getString("discordId");
+            this.discord = document.getString("discordId");
 
             this.gold = document.getInteger("gold");
 
             this.experience = document.getLong("experience");
 
-            this.gamemodeStorages.clear();
-            for(Map.Entry<String, Object> ent : document.get("gamemodeStorage", Document.class).entrySet()) {
+            this.gamemodeStorages = new HashMap<>();
+            for(Map.Entry<String, Object> ent : document.get("gamemodeStorages", Document.class).entrySet()) {
                 this.gamemodeStorages.put(Gamemode.getByName(ent.getKey()), new GamemodeStorage(ent.getKey(), (Document) ent.getValue()));
             }
 
-            this.ignored.clear();
+            this.ignored = new ArrayList<>();
             for (String ignored : document.getList("ignored", String.class)) {
                 UUID ignoredUUID = UUID.fromString(ignored);
                 this.ignored.add(ignoredUUID);
             }
 
-            this.friends.clear();
+            this.friends = new ArrayList<>();
             for (String friends : document.getList("friends", String.class)) {
                 UUID friendUUID = UUID.fromString(friends);
                 this.friends.add(friendUUID);
             }
 
-            this.permissions.clear();
+            this.permissions = new ArrayList<>();
             this.permissions.addAll(document.getList("permissions", String.class));
 
-            this.punishments.clear();
+            this.punishments = new ArrayList<>();
             this.punishments.addAll(document.getList("punishments", String.class));
 
-            this.cachedPunishments.clear();
+            this.cachedPunishments = new ArrayList<>();
             this.cachedPunishments.addAll(this.punishments.stream().map(Punishment::getPunishment).filter(Objects::nonNull).collect(Collectors.toList()));
 
-            this.grants.clear();
+            this.grants = new ArrayList<>();
             this.grants.addAll(document.getList("grants", String.class));
 
-            this.cachedGrants.clear();
+            this.cachedGrants = new ArrayList<>();
             this.cachedGrants.addAll(this.grants.stream().map(Grant::getGrant).filter(Objects::nonNull).collect(Collectors.toList()));
         }
 
@@ -163,29 +198,25 @@ public class Profile {
         this.api.getActiveGrant();
     }
 
-    public void save() {
-        Document document = new Document();
+    /**
+     * <strong>Usage reserved for Atom.</strong>
+     */
+    public Document toDocument() {
+        var document = new Document();
         document.put("_id", this.id.toString());
         document.put("name", this.name);
         document.put("searchableName", this.name.toUpperCase());
-        document.put("firstSeen", this.firstSeen != null ? this.firstSeen.toString() : String.valueOf(System.currentTimeMillis()));
-        document.put("lastSeen", this.lastSeen != null ? this.lastSeen.toString() : String.valueOf(System.currentTimeMillis()));
+        document.put("firstSeen", Objects.requireNonNullElse(this.firstSeen, System.currentTimeMillis()));
+        document.put("lastSeen", Objects.requireNonNullElse(this.firstSeen, System.currentTimeMillis()));
         document.put("currentAddress", this.currentAddress);
 
         document.put("optionsProfile", this.optionsProfile.toDocument());
         document.put("staffProfile", this.staffProfile.toDocument());
 
-        Document staffDocument = new Document();
-        staffDocument.put("twoFactorKey", this.staffProfile.getTwoFactorKey());
-        staffDocument.put("operator", this.staffProfile.isOperator());
-        staffDocument.put("receivingStaffMessages", this.staffProfile.isReceivingStaffMessages());
-        staffDocument.put("twoFactor", this.staffProfile.isTwoFactor());
-        staffDocument.put("locked", this.staffProfile.isLocked());
-        document.put("staff", staffDocument);
-
-        document.put("discord", this.discordId);
+        document.put("discord", this.discord);
 
         document.put("gold", this.gold);
+        document.put("experience", this.experience);
 
         var storagesDocument = new Document();
         for(Map.Entry<Gamemode, GamemodeStorage> ent : this.gamemodeStorages.entrySet()) {
@@ -197,9 +228,7 @@ public class Profile {
             }
             storagesDocument.put(ent.getKey().getName(), storageDocument);
         }
-        document.put("gamemodeStorage", storagesDocument);
-
-        document.put("experience", this.experience);
+        document.put("gamemodeStorages", storagesDocument);
 
         document.put("grants", this.grants);
 
@@ -211,12 +240,17 @@ public class Profile {
 
         document.put("friends", this.friends);
 
-        collection.replaceOne(Filters.eq("_id", this.id.toString()), document, new ReplaceOptions().upsert(true));
+        return document;
     }
 
     @Override
     public boolean equals(Object object) {
         return object instanceof Profile other && other.id.equals(this.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     @Getter @Setter
