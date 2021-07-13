@@ -1,6 +1,6 @@
 package com.customwrld.commonlib;
 
-import com.customwrld.commonlib.modules.api.APIProvider;
+import com.customwrld.commonlib.modules.api.APIListener;
 import com.customwrld.commonlib.modules.pigeon.Listeners;
 import com.customwrld.commonlib.modules.rank.RankAPI;
 import com.customwrld.commonlib.util.PigeonUtil;
@@ -22,7 +22,7 @@ public class CommonLib {
     private final MongoDatabase mongoDatabase;
     private final Pigeon pigeon;
     private final TimerManager timerManager;
-    private final Set<APIProvider> apiProviders;
+    private final Set<APIListener> apiListeners;
 
     public CommonLib(MongoClient mongoClient, MongoDatabase mongoDatabase, Pigeon pigeon) {
         commonLib = this;
@@ -46,7 +46,7 @@ public class CommonLib {
 
         this.timerManager = new TimerManager();
 
-        this.apiProviders = new HashSet<>();
+        this.apiListeners = new HashSet<>();
     }
 
 }

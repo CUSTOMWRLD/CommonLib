@@ -135,7 +135,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new PunishmentAddPayload(punishment.getId()));
 
-        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentAdd(punishment));
+        CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentAdd(punishment));
     }
 
     /**
@@ -148,7 +148,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new PunishmentRemovePayload(punishment.getId()));
 
-        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentRemove(punishment));
+        CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentRemove(punishment));
     }
 
     /**
@@ -161,7 +161,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new PunishmentExpirePayload(punishment.getId()));
 
-        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentExpire(punishment));
+        CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentExpire(punishment));
     }
 
     /**
@@ -219,7 +219,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new GrantAddPayload(grant.getId()));
 
-        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantAdd(grant));
+        CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantAdd(grant));
     }
 
     /**
@@ -231,7 +231,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new GrantRemovePayload(grant.getId()));
 
-        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantRemove(grant));
+        CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantRemove(grant));
     }
 
     /**
@@ -243,7 +243,7 @@ public class ProfileAPI {
 
         this.commonLib.getPigeon().broadcast(new GrantExpirePayload(grant.getId()));
 
-        CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantExpire(grant));
+        CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantExpire(grant));
     }
 
     public boolean addGamemodeStorage(GamemodeStorage storage) {

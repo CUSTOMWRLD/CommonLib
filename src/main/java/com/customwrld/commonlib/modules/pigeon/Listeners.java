@@ -24,13 +24,7 @@ public class Listeners implements Listener {
         Grant grant = Grant.getGrant(payload.getGrant());
 
         if(grant != null) {
-            Profile profile = ProfileAPI.getCachedProfile(grant.getPlayerUUID());
-
-            if(profile != null) {
-                profile.load();
-
-                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantAdd(grant));
-            }
+            CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantAdd(grant));
         }
     }
 
@@ -38,83 +32,40 @@ public class Listeners implements Listener {
     public void onGrantRemove(GrantRemovePayload payload) {
         Grant grant = Grant.getGrant(payload.getGrant());
 
-        if(grant != null) {
-            Profile profile = ProfileAPI.getCachedProfile(grant.getPlayerUUID());
-
-            if(profile != null) {
-                profile.load();
-
-                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantRemove(grant));
-            }
-        }
+        if(grant != null)
+            CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantRemove(grant));
     }
 
     @PayloadHandler
     public void onGrantExpire(GrantExpirePayload payload) {
         Grant grant = Grant.getGrant(payload.getGrant());
 
-        if(grant != null) {
-            Profile profile = ProfileAPI.getCachedProfile(grant.getPlayerUUID());
-
-            if(profile != null) {
-                profile.load();
-
-                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.grantExpire(grant));
-            }
-        }
+        if(grant != null)
+            CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.grantExpire(grant));
     }
 
     @PayloadHandler
     public void onPunishmentAdd(PunishmentAddPayload payload) {
         Punishment punishment = Punishment.getPunishment(payload.getPunishment());
 
-        if(punishment != null) {
-            Profile profile = ProfileAPI.getCachedProfile(punishment.getPlayerUUID());
-
-            if(profile != null) {
-                profile.load();
-
-                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentAdd(punishment));
-            }
-        }
+        if(punishment != null)
+            CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentAdd(punishment));
     }
 
     @PayloadHandler
     public void onPunishmentRemove(PunishmentRemovePayload payload) {
         Punishment punishment = Punishment.getPunishment(payload.getPunishment());
 
-        if(punishment != null) {
-            Profile profile = ProfileAPI.getCachedProfile(punishment.getPlayerUUID());
-
-            if(profile != null) {
-                profile.load();
-
-                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentRemove(punishment));
-            }
-        }
+        if(punishment != null)
+            CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentRemove(punishment));
     }
 
     @PayloadHandler
     public void onPunishmentExpire(PunishmentExpirePayload payload) {
         Punishment punishment = Punishment.getPunishment(payload.getPunishment());
 
-        if(punishment != null) {
-            Profile profile = ProfileAPI.getCachedProfile(punishment.getPlayerUUID());
-
-            if(profile != null) {
-                profile.load();
-
-                CommonLib.getCommonLib().getApiProviders().forEach(provider -> provider.punishmentExpire(punishment));
-            }
-        }
-    }
-    @PayloadHandler
-    public void onRecalculateProfile(RecalculateProfilePayload payload) {
-        Profile profile = ProfileAPI.getCachedProfile(payload.getProfile());
-
-        if(profile != null) {
-            profile.load();
-        }
+        if(punishment != null)
+            CommonLib.getCommonLib().getApiListeners().forEach(provider -> provider.punishmentExpire(punishment));
     }
 
 }
