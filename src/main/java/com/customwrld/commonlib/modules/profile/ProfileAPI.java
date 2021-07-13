@@ -101,13 +101,12 @@ public class ProfileAPI {
      */
     public List<String> getRankPermissions() {
         List<String> permissions = new ArrayList<>();
-        for (Grant grant : this.profile.getCachedGrants()) {
+        permissions.addAll(Grant.DEFAULT_GRANT.api().getRank().getPermissions());
 
+        for(Grant grant : this.profile.getCachedGrants()) {
             Rank rank = grant.api().getRank();
-
-            if(rank != null && grant.api().isActive()) {
+            if(rank != null && grant.api().isActive())
                 permissions.addAll(grant.api().getRank().api().getAllPermissions());
-            }
         }
         return permissions;
     }

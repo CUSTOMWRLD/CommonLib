@@ -45,6 +45,10 @@ public class Grant {
     @Accessors(fluent = true)
     private final GrantAPI api;
 
+    public Grant() {
+        this.api = new GrantAPI(this);
+    }
+
     public Grant(UUID playerUUID, UUID rankUUID, UUID addedByUUID, long addedAt, String addedReason, long duration) {
         this.id = Util.generateId();
         this.playerUUID = playerUUID;

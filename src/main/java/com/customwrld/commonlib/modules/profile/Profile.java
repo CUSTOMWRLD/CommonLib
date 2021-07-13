@@ -108,13 +108,8 @@ public class Profile {
             this.lastSeen = Long.parseLong(document.getString("lastSeen"));
             this.currentAddress = document.getString("currentAddress");
 
-            Document optionsDocument = (Document) document.get("options");
-            Options options = this.getOptionsProfile();
-
-            options.receivingFriendRequests = optionsDocument.getBoolean("receivingFriendRequests");
-            options.receivingPublicChat = optionsDocument.getBoolean("receivingPublicChat");
-            options.receivingConversations = optionsDocument.getBoolean("receivingConversations");
-            options.receivingMessageSounds = optionsDocument.getBoolean("receivingMessageSounds");
+            this.optionsProfile = new Options(document.get("optionsProfile", Document.class));
+            this.staffProfile = new Staff(document.get("staffProfile", Document.class));
 
             Document staffDocument = (Document) document.get("staff");
             Staff staff = this.getStaffProfile();
@@ -177,12 +172,8 @@ public class Profile {
         document.put("lastSeen", this.lastSeen != null ? this.lastSeen.toString() : String.valueOf(System.currentTimeMillis()));
         document.put("currentAddress", this.currentAddress);
 
-        Document optionsDocument = new Document();
-        optionsDocument.put("receivingFriendRequests", this.optionsProfile.isReceivingFriendRequests());
-        optionsDocument.put("receivingPublicChat", this.optionsProfile.isReceivingPublicChat());
-        optionsDocument.put("receivingConversations", this.optionsProfile.isReceivingConversations());
-        optionsDocument.put("receivingMessageSounds", this.optionsProfile.isReceivingMessageSounds());
-        document.put("options", optionsDocument);
+        document.put("optionsProfile", this.optionsProfile.toDocument());
+        document.put("staffProfile", this.staffProfile.toDocument());
 
         Document staffDocument = new Document();
         staffDocument.put("twoFactorKey", this.staffProfile.getTwoFactorKey());
@@ -237,6 +228,25 @@ public class Profile {
         private boolean receivingConversations = true;
         private boolean receivingMessageSounds = true;
 
+        public Options() {}
+
+        public Options(Document document) {
+            this.receivingPartyRequests = document.getBoolean("receivingPartyRequests");
+            this.receivingFriendRequests = document.getBoolean("receivingFriendRequests");
+            this.receivingPublicChat = document.getBoolean("receivingPublicChat");
+            this.receivingConversations = document.getBoolean("receivingConversations");
+            this.receivingMessageSounds = document.getBoolean("receivingMessageSounds");
+        }
+
+        public Document toDocument() {
+            return new Document()
+                    .append("receivingPartyRequests", this.receivingPartyRequests)
+                    .append("receivingFriendRequests", this.receivingFriendRequests)
+                    .append("receivingPublicChat", this.receivingPublicChat)
+                    .append("receivingConversations", this.receivingConversations)
+                    .append("receivingMessageSounds", this.receivingMessageSounds);
+        }
+
     }
 
     @Getter @Setter
@@ -247,6 +257,25 @@ public class Profile {
         private boolean twoFactor;
         private boolean locked;
         private boolean operator;
+
+        public Staff() {}
+
+        public Staff(Document document) {
+            this.twoFactorKey = document.getString("twoFactorKey");
+            this.receivingStaffMessages = document.getBoolean("receivingStaffMessages");
+            this.twoFactor = document.getBoolean("twoFactor");
+            this.locked = document.getBoolean("locked");
+            this.operator = document.getBoolean("operator");
+        }
+
+        public Document toDocument() {
+            return new Document()
+                    .append("twoFactorKey", this.twoFactorKey)
+                    .append("receivingStaffMessages", this.receivingStaffMessages)
+                    .append("twoFactor", this.twoFactor)
+                    .append("locked", this.locked)
+                    .append("operator", this.operator);
+        }
 
     }
 
