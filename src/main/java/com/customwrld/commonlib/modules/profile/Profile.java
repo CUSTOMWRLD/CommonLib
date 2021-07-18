@@ -93,12 +93,32 @@ public class Profile {
         return new Profile(document);
     }
 
+    public static CompletableFuture<Profile> getProfile(@NotNull UUID id) {
+        var future = new CompletableFuture<Profile>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileRequestPayload(id, payload -> {
+                    List<Profile> profiles = payload.getProfiles();
+                    if(profiles == null || profiles.isEmpty()) { future.complete(null); }
+
+                    future.complete(payload.getProfiles().get(0));
+                }), PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
     public static CompletableFuture<Profile> getProfile(@NotNull String name) {
         var future = new CompletableFuture<Profile>();
 
         CommonLib.getCommonLib()
                 .getPigeon()
-                .sendTo(new ProfileRequestPayload(name, payload -> future.complete(payload.getProfile())), PigeonUtil.GeneralUnits.ATOM.getUnit());
+                .sendTo(new ProfileRequestPayload(name, payload -> {
+                    List<Profile> profiles = payload.getProfiles();
+                    if(profiles == null || profiles.isEmpty()) { future.complete(null); }
+
+                    future.complete(payload.getProfiles().get(0));
+                }), PigeonUtil.GeneralUnits.ATOM.getUnit());
 
         return future;
     }
@@ -109,18 +129,61 @@ public class Profile {
         CommonLib.getCommonLib()
                 .getPigeon()
                 .sendTo(new ProfileRequestPayload(name, id, payload -> {
-                    future.complete(payload.getProfile());
+                    List<Profile> profiles = payload.getProfiles();
+                    if(profiles == null || profiles.isEmpty()) { future.complete(null); }
+
+                    future.complete(payload.getProfiles().get(0));
                 }), PigeonUtil.GeneralUnits.ATOM.getUnit());
 
         return future;
     }
 
-    public static CompletableFuture<Profile> getProfile(@NotNull UUID id) {
-        var future = new CompletableFuture<Profile>();
+    //Bulk
+
+    public static CompletableFuture<List<Profile>> getProfilesByIds(@NotNull List<UUID> ids) {
+        var future = new CompletableFuture<List<Profile>>();
 
         CommonLib.getCommonLib()
                 .getPigeon()
-                .sendTo(new ProfileRequestPayload(id, payload -> future.complete(payload.getProfile())), PigeonUtil.GeneralUnits.ATOM.getUnit());
+                .sendTo(ProfileRequestPayload.bulkRequestByIds(ids,
+                        payload -> future.complete(Objects.requireNonNullElse(payload.getProfiles(), new ArrayList<>()))),
+                        PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
+    public static CompletableFuture<List<Profile>> getProfilesByNames(@NotNull List<String> names) {
+        var future = new CompletableFuture<List<Profile>>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(ProfileRequestPayload.bulkRequestByNames(names,
+                        payload -> future.complete(Objects.requireNonNullElse(payload.getProfiles(), new ArrayList<>()))),
+                        PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
+    public static CompletableFuture<List<Profile>> getProfiles(List<String> names, List<UUID> ids) {
+        var future = new CompletableFuture<List<Profile>>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileRequestPayload(names, ids,
+                                payload -> future.complete(Objects.requireNonNullElse(payload.getProfiles(), new ArrayList<>()))),
+                        PigeonUtil.GeneralUnits.ATOM.getUnit());
+
+        return future;
+    }
+
+    public static CompletableFuture<List<Profile>> getProfiles(Map<UUID, String> info) {
+        var future = new CompletableFuture<List<Profile>>();
+
+        CommonLib.getCommonLib()
+                .getPigeon()
+                .sendTo(new ProfileRequestPayload(info,
+                                payload -> future.complete(Objects.requireNonNullElse(payload.getProfiles(), new ArrayList<>()))),
+                        PigeonUtil.GeneralUnits.ATOM.getUnit());
 
         return future;
     }

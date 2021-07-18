@@ -11,9 +11,10 @@ import com.customwrld.pigeon.feedback.FeedbackState;
 import com.customwrld.pigeon.feedback.RequiredState;
 import com.customwrld.pigeon.payloads.bases.FeedbackPayload;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -29,6 +30,8 @@ public class ProfileRequestPayload extends FeedbackPayload {
 
     //Request
 
+    @Transmit Type type;
+
     @Nullable @Transmit(direction = RequiredState.REQUEST) String name;
     @Nullable @Transmit(direction = RequiredState.REQUEST) UUID id;
 
@@ -37,6 +40,8 @@ public class ProfileRequestPayload extends FeedbackPayload {
         this();
         this.payloadState = FeedbackState.REQUEST;
         this.feedbackID = UUID.randomUUID();
+
+        this.type = Type.SINGLE;
 
         this.name = name;
         this.id = id;
@@ -54,21 +59,86 @@ public class ProfileRequestPayload extends FeedbackPayload {
         this(null, id, feedback);
     }
 
+
+    //Bulk
+    @Nullable @Transmit(direction = RequiredState.REQUEST) List<String> names;
+    @Nullable @Transmit(direction = RequiredState.REQUEST) List<UUID> ids;
+
+    //If set to true, it makes names and ids "connected".
+    //This means that one index represents a profile and if both lists contain an element, then both elements refer to the same profile.
+    //Likewise if set to false, then we're sure elements at the same index won't refer to one and the same profile.
+    @Transmit(direction = RequiredState.REQUEST)
+    @Accessors(fluent = true)
+    boolean areConnected;
+
+    @RequestConstructor
+    public ProfileRequestPayload(Map<UUID, String> info, Consumer<ProfileRequestPayload> feedback) {
+        this();
+        this.payloadState = FeedbackState.REQUEST;
+        this.feedbackID = UUID.randomUUID();
+
+        this.type = Type.BULK;
+        this.areConnected = true;
+
+        this.names = new ArrayList<>();
+        this.ids = new ArrayList<>();
+
+        for(Map.Entry<UUID, String> ent : info.entrySet()) {
+            this.ids.add(ent.getKey());
+            this.names.add(ent.getValue());
+        }
+
+        this.feedback = feedback;
+    }
+
+    //I can't make two constructors (one with a list of strings and other with uuids) because of type erasure and thus constructors clashing
+    @RequestConstructor
+    public ProfileRequestPayload(@Nullable List<String> names, @Nullable List<UUID> ids, Consumer<ProfileRequestPayload> feedback) {
+        this();
+        this.payloadState = FeedbackState.REQUEST;
+        this.feedbackID = UUID.randomUUID();
+
+        this.type = Type.BULK;
+        this.areConnected = false;
+
+        this.names = names;
+        this.ids = ids;
+
+        this.feedback = feedback;
+    }
+
+    public static ProfileRequestPayload bulkRequestByNames(List<String> names, Consumer<ProfileRequestPayload> feedback) {
+        return new ProfileRequestPayload(names, null, feedback);
+    }
+
+    public static ProfileRequestPayload bulkRequestByIds(List<UUID> ids, Consumer<ProfileRequestPayload> feedback) {
+        return new ProfileRequestPayload(null, ids, feedback);
+    }
+
     //Response
 
     @Nullable @Transmit(direction = RequiredState.RESPONSE) ProfileQueryResult result;
-    @Nullable @Transmit(direction = RequiredState.RESPONSE) Profile profile;
+
+    // I thought it'd be easier to understand if it was just one field instead of both profile (for SINGLE request) and profiles (for BULK) fields
+    // because then you'd have two methods payload.getProfile() and payload.getProfiles().
+    // But this way you can just payload.getProfiles().get(0) if it's SINGLE.
+    @Nullable @Transmit(direction = RequiredState.RESPONSE) List<Profile> profiles;
 
     @ResponseConstructor
-    public ProfileRequestPayload(ProfileQueryResult result, Profile profile) {
+    public ProfileRequestPayload(ProfileQueryResult result, List<Profile> profiles) {
         this();
         this.payloadState = FeedbackState.RESPONSE;
 
         this.result = result;
-        this.profile = profile;
+        this.profiles = profiles;
     }
 
     @Override
     public void receive() {}
+
+    public enum Type {
+        SINGLE,
+        BULK
+    }
 
 }
