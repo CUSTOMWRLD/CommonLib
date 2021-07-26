@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class Profile {
 
     @Getter private static final MongoCollection<Document> collection = CommonLib.getCommonLib().getMongoDatabase().getCollection("profiles");
-//    @Getter private static final Map<UUID, Profile> profiles = new HashMap<>();
 
     private UUID id;
     private List<String> permissions;

@@ -113,6 +113,13 @@ public class MC {
                     Integer.valueOf(colorStr.substring(4, 6), 16));
         }
 
+        public static int bleach(Color color, double amount) {
+            int red = (int) ((color.getRed() * (1 - amount) / 255 + amount) * 255);
+            int green = (int) ((color.getGreen() * (1 - amount) / 255 + amount) * 255);
+            int blue = (int) ((color.getBlue() * (1 - amount) / 255 + amount) * 255);
+            return new Color(red, green, blue).getRGB();
+        }
+
         public static TextComponent gradientComponent(String text, Color from, Color to) {
             TextComponent.Builder builder = Component.text();
 

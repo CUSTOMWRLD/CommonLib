@@ -13,8 +13,12 @@ import com.customwrld.commonlib.modules.pigeon.payloads.punishment.PunishmentRem
 import com.customwrld.commonlib.modules.punishment.Punishment;
 import com.customwrld.commonlib.modules.rank.Rank;
 import com.customwrld.commonlib.util.MC;
+import com.customwrld.commonlib.util.MC.CC;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -71,7 +75,7 @@ public class ProfileAPI {
     public Punishment getActiveBan() {
         Punishment punishment = this.getActivePunishmentByType(Punishment.Type.BLACKLIST);
 
-        if(punishment != null) {
+        if (punishment != null) {
             return punishment;
         }
 
@@ -97,9 +101,9 @@ public class ProfileAPI {
         List<String> permissions = new ArrayList<>();
         permissions.addAll(Grant.DEFAULT_GRANT.api().getRank().getPermissions());
 
-        for(Grant grant : this.profile.getCachedGrants()) {
+        for (Grant grant : this.profile.getCachedGrants()) {
             Rank rank = grant.api().getRank();
-            if(rank != null && grant.api().isActive())
+            if (rank != null && grant.api().isActive())
                 permissions.addAll(grant.api().getRank().api().getAllPermissions());
         }
         return permissions;
@@ -161,7 +165,7 @@ public class ProfileAPI {
      * Validates the Profile's Grants.
      */
     public void validateGrants() {
-        for (final var it = this.profile.getCachedGrants().iterator(); it.hasNext();) {
+        for (final var it = this.profile.getCachedGrants().iterator(); it.hasNext(); ) {
             Grant grant = it.next();
 
             if (Rank.getRank(grant.getRankUUID(), true) == null) {
@@ -182,7 +186,7 @@ public class ProfileAPI {
 
         List<Grant> activeGrants = new ArrayList<>();
 
-        for(Grant grant : this.profile.getCachedGrants()) {
+        for (Grant grant : this.profile.getCachedGrants()) {
             if (!grant.isRemoved() && !grant.api().hasExpired()) {
                 activeGrants.add(grant);
             }
@@ -195,7 +199,9 @@ public class ProfileAPI {
      * Adds a new Grant to the Profile.
      */
     public void addGrant(Grant grant) {
-        if(grant == Grant.DEFAULT_GRANT) { return; }
+        if (grant == Grant.DEFAULT_GRANT) {
+            return;
+        }
 
         this.profile.getGrants().add(grant.getId());
         this.profile.getCachedGrants().add(grant);
@@ -212,7 +218,9 @@ public class ProfileAPI {
      * Removes a Grant from the Profile.
      */
     public void removeGrant(Grant grant, UUID removedBy, Long removedAt, String removedReason) {
-        if(grant == Grant.DEFAULT_GRANT) { return; }
+        if (grant == Grant.DEFAULT_GRANT) {
+            return;
+        }
 
         grant.api().remove(removedBy, removedAt, removedReason);
         this.profile.update();
@@ -226,7 +234,9 @@ public class ProfileAPI {
      * Expires a Grant on the Profile.
      */
     public void expireGrant(Grant grant, Long removedAt) {
-        if(grant == Grant.DEFAULT_GRANT) { return; }
+        if (grant == Grant.DEFAULT_GRANT) {
+            return;
+        }
 
         grant.api().remove(null, removedAt, "Grant Expired");
         this.profile.update();
@@ -240,7 +250,9 @@ public class ProfileAPI {
         var gamemodeStorages = this.profile.getGamemodeStorages();
 
         var gamemode = storage.getGamemode();
-        if(gamemodeStorages.containsKey(gamemode)) { return false; }
+        if (gamemodeStorages.containsKey(gamemode)) {
+            return false;
+        }
 
         gamemodeStorages.put(gamemode, storage);
         return true;
@@ -257,16 +269,18 @@ public class ProfileAPI {
     public boolean ensureGamemodeStorage(Gamemode gamemode, List<GamemodeStorage.StorageValue> values) {
         var anyEnsured = false;
 
-        if(hasGamemodeStorage(gamemode)) {
+        if (hasGamemodeStorage(gamemode)) {
             var storage = getGamemodeStorage(gamemode);
-            for(GamemodeStorage.StorageValue value : values) {
-                if(storage.ensure(value)) { anyEnsured = true; }
+            for (GamemodeStorage.StorageValue value : values) {
+                if (storage.ensure(value)) {
+                    anyEnsured = true;
+                }
             }
         } else {
             anyEnsured = true;
 
             var storage = new GamemodeStorage(gamemode);
-            for(GamemodeStorage.StorageValue value : values) {
+            for (GamemodeStorage.StorageValue value : values) {
                 storage.add(value);
             }
 
@@ -276,18 +290,37 @@ public class ProfileAPI {
         return anyEnsured;
     }
 
+    private HoverEvent<Component> hoverFormat() {
+        Component chatFormat = this.profile.api().getChatFormat();
+        Rank rank = this.profile.api().getActiveGrant().api().getRank();
+        TextColor color = MC.CC.valueOf(rank.getColor()).getTextColor();
+
+        return HoverEvent.showText(Component.text()
+                .append(chatFormat
+                        .append(Component.newline()))
+                .append(Component.text()
+                        .append(Component.text(" \u00BB ", CC.DARK_GRAY.getTextColor(), TextDecoration.BOLD))
+                        .append(Component.text("Name: ", MC.CC.GRAY.getTextColor()))
+                        .append(Component.text(this.profile.getName(), color)
+                                .append(Component.newline()))
+                        .append(Component.text()
+                                .append(Component.text(" \u00BB ", CC.DARK_GRAY.getTextColor(), TextDecoration.BOLD))
+                                .append(Component.text("Rank: ", MC.CC.GRAY.getTextColor()))
+                                .append(Component.text(rank.getName(), color)))));
+    }
+
     public Component getChatFormat() {
-        return getColoredPrefix().append(this.getColoredName());
+        return getColoredPrefix().append(this.getColoredName()).hoverEvent(hoverFormat());
     }
 
     public Component getColoredName() {
         Rank rank = this.profile.api().getActiveGrant().api().getRank();
-        return Component.text(this.profile.getName()).color(TextColor.color(rank.api().getRankColor().getRGB()));
+        return Component.text(this.profile.getName(), MC.CC.valueOf(rank.getColor()).getTextColor()).hoverEvent(hoverFormat());
     }
 
     public Component getColoredPrefix() {
         Rank rank = this.profile.api().getActiveGrant().api().getRank();
-        return rank.getPrefix() != null ? MC.Style.fromLegacy(rank.getPrefix()) : Component.empty();
+        return rank.getPrefix() != null ? MC.Style.fromLegacy(rank.getPrefix()).hoverEvent(hoverFormat()) : Component.empty();
     }
 
 }

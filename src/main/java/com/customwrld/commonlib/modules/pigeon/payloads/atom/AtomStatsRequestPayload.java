@@ -1,5 +1,7 @@
 package com.customwrld.commonlib.modules.pigeon.payloads.atom;
 
+import com.customwrld.commonlib.CommonLib;
+import com.customwrld.commonlib.modules.network.Server;
 import com.customwrld.pigeon.annotations.Payload;
 import com.customwrld.pigeon.annotations.RequestConstructor;
 import com.customwrld.pigeon.annotations.ResponseConstructor;
@@ -38,7 +40,7 @@ public class AtomStatsRequestPayload extends FeedbackPayload {
     @Transmit(direction = RequiredState.RESPONSE) Long uptime;
     @Transmit(direction = RequiredState.RESPONSE) Long usedMemory;
     @Transmit(direction = RequiredState.RESPONSE) Double usedCpu;
-    @Transmit(direction = RequiredState.RESPONSE) List<String> servers;
+    @Transmit(direction = RequiredState.RESPONSE) List<Server> servers;
 
     @ResponseConstructor
     public AtomStatsRequestPayload(Long latency) {
@@ -49,7 +51,7 @@ public class AtomStatsRequestPayload extends FeedbackPayload {
         this.uptime = ManagementFactory.getRuntimeMXBean().getUptime();
         this.usedMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory();
         this.usedCpu = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getProcessCpuLoad();
-        this.servers = Arrays.asList("TODO: Fix this");
+        this.servers = Server.serverList;
     }
 
     @Override
